@@ -1,0 +1,1017 @@
+# Tailwind CSS v4 Documentation
+
+@doc-version: v4.2
+@doc-source: https://tailwindcss.com/docs
+@note: Tailwind v4 uses CSS-first configuration. Use @theme, @utility, @custom-variant in CSS instead of tailwind.config.js
+
+---
+title: Overview
+description: Tailwind CSS is a utility-first CSS framework. It scans your source files for class names, generates corresponding styles, and writes them to a static CSS file. Fast, flexible, zero-runtime.
+url: "https://tailwindcss.com/docs"
+---
+
+# Tailwind CSS v4
+
+Tailwind CSS works by scanning all of your HTML files, JavaScript components, and templates for class names, generating the corresponding styles and writing them to a static CSS file.
+
+## Installation (Vite)
+
+```bash
+npm install tailwindcss @tailwindcss/vite
+```
+
+```ts
+// vite.config.ts
+import tailwindcss from '@tailwindcss/vite'
+export default defineConfig({ plugins: [tailwindcss()] })
+```
+
+```css
+/* app.css */
+@import "tailwindcss";
+```
+
+## Installation (PostCSS)
+
+```bash
+npm install tailwindcss @tailwindcss/postcss postcss
+```
+
+```css
+@import "tailwindcss";
+```
+
+---
+title: Styling with utility classes
+description: Building complex components from a constrained set of primitive utilities.
+url: "https://tailwindcss.com/docs/styling-with-utility-classes"
+---
+
+# Styling with utility classes
+
+## Overview
+
+Style elements by combining single-purpose utility classes directly in markup:
+
+```html
+<div class="mx-auto flex max-w-sm items-center gap-x-4 rounded-xl bg-white p-6 shadow-lg">
+  <img class="size-12 shrink-0" src="/logo.svg" alt="Logo" />
+  <div>
+    <div class="text-xl font-medium text-black">Title</div>
+    <p class="text-gray-500">Description</p>
+  </div>
+</div>
+```
+
+## Key benefits
+
+- CSS stops growing — utility classes are reusable
+- Code is portable — structure and styling live together
+- Easier maintenance — change classes directly, no hunting through CSS
+- Safer changes — utilities only affect the element they're on
+- Faster development — no class naming, no context switching
+
+## Why not inline styles?
+
+- Media queries — Tailwind's responsive variants (sm:, md:, lg:)
+- Hover, focus, states — state variants (hover:, focus:, active:)
+- Design constraints — predefined design tokens from theme
+
+## Variants
+
+Prefix any utility with a variant to apply conditionally:
+
+- `hover:bg-sky-700` — on hover
+- `md:flex` — at medium breakpoint and up
+- `dark:bg-gray-800` — in dark mode
+- `disabled:opacity-50` — when disabled
+
+Stack variants: `dark:md:hover:bg-indigo-600`
+
+## Arbitrary values
+
+Use square brackets for one-off values:
+
+```html
+<div class="bg-[#316ff6] text-[22px] top-[117px]"></div>
+<div class="grid grid-cols-[24rem_2.5rem_minmax(0,1fr)]"></div>
+<div class="max-h-[calc(100dvh-(--spacing(6)))]"></div>
+<div class="[--gutter-width:1rem] lg:[--gutter-width:2rem]"></div>
+```
+
+CSS variable shorthand: `fill-(--my-brand-color)` = `fill-[var(--my-brand-color)]`
+
+## Arbitrary properties
+
+```html
+<div class="[mask-type:luminance] hover:[mask-type:alpha]"></div>
+```
+
+## Managing duplication
+
+- Use loops — render repeated elements from data
+- Multi-cursor editing — edit multiple elements at once
+- Components — extract reusable UI into components
+- Custom CSS — @layer components for btn-primary etc.
+
+## Managing conflicts
+
+- Later class wins — `grid flex` → grid wins
+- Important modifier — `bg-red-500!` for !important
+- Important flag — `@import "tailwindcss" important;`
+- Prefix — `@import "tailwindcss" prefix(tw);` → tw:text-red-500
+
+---
+title: Hover, focus, and other states
+description: Using variants to style elements on hover, focus, and more.
+url: "https://tailwindcss.com/docs/hover-focus-and-other-states"
+---
+
+# Hover, focus, and other states
+
+## Pseudo-classes
+
+| Variant | Targets |
+|---------|---------|
+| hover | :hover |
+| focus | :focus |
+| focus-within | :focus-within |
+| focus-visible | :focus-visible |
+| active | :active |
+| visited | :visited |
+| disabled | :disabled |
+| required | :required |
+| invalid | :invalid |
+| read-only | :read-only |
+| checked | :checked |
+| indeterminate | :indeterminate |
+| first | :first-child |
+| last | :last-child |
+| only | :only-child |
+| odd | :nth-child(odd) |
+| even | :nth-child(even) |
+| first-of-type | :first-of-type |
+| last-of-type | :last-of-type |
+| only-of-type | :only-of-type |
+| empty | :empty |
+| nth-3 | :nth-child(3) |
+| nth-last-5 | :nth-last-child(5) |
+| nth-of-type-4 | :nth-of-type(4) |
+| nth-last-of-type-6 | :nth-last-of-type(6) |
+| has-* | :has() — e.g. has-[:focus], has-[img] |
+| not-* | :not() — e.g. not-focus:, not-supports-[display:grid]: |
+
+## Parent/sibling state
+
+- `group` + `group-hover:`, `group-focus:`, `group-active:` — style based on parent
+- `group/{name}` + `group-hover/{name}:` — named groups for nesting
+- `peer` + `peer-invalid:`, `peer-checked:`, `peer-disabled:` — style based on previous sibling
+- `peer/{name}` + `peer-checked/{name}:` — named peers
+- `in-*` — responds to any parent (in-focus:, in-hover:)
+
+## Pseudo-elements
+
+| Variant | Targets |
+|---------|---------|
+| before | ::before |
+| after | ::after |
+| placeholder | ::placeholder |
+| file | ::file-selector-button |
+| marker | ::marker |
+| selection | ::selection |
+| first-letter | ::first-letter |
+| first-line | ::first-line |
+
+## Attribute selectors
+
+- `[dir="rtl"]`, `[dir="ltr"]`
+- `[open]` — open state
+- `[aria-*]` — ARIA attributes
+
+## Media/feature queries
+
+- `dark` — prefers-color-scheme: dark
+- `portrait`, `landscape`
+- `motion-reduce`, `motion-safe`
+- `contrast-more`, `contrast-less`
+- `forced-colors`
+- `supports-[...]` — e.g. supports-[display:grid]
+
+---
+title: Responsive design
+description: Using breakpoint variants to build adaptive interfaces.
+url: "https://tailwindcss.com/docs/responsive-design"
+---
+
+# Responsive design
+
+## Breakpoints (mobile-first)
+
+| Prefix | Min width | CSS |
+|--------|-----------|-----|
+| (none) | all | default |
+| sm | 40rem (640px) | @media (width >= 40rem) |
+| md | 48rem (768px) | @media (width >= 48rem) |
+| lg | 64rem (1024px) | @media (width >= 64rem) |
+| xl | 80rem (1280px) | @media (width >= 80rem) |
+| 2xl | 96rem (1536px) | @media (width >= 96rem) |
+
+## Max-width variants
+
+| Variant | Media query |
+|---------|-------------|
+| max-sm | width < 40rem |
+| max-md | width < 48rem |
+| max-lg | width < 64rem |
+| max-xl | width < 80rem |
+| max-2xl | width < 96rem |
+
+## Targeting ranges
+
+- `md:max-xl:flex` — between md and xl
+- `md:max-lg:flex` — only at md breakpoint
+
+## Custom breakpoints
+
+```css
+@theme {
+  --breakpoint-xs: 30rem;
+  --breakpoint-3xl: 120rem;
+}
+```
+
+## Arbitrary breakpoints
+
+```html
+<div class="max-[600px]:bg-sky-300 min-[320px]:text-center"></div>
+```
+
+## Container queries
+
+- `@container` — mark element as container
+- `@sm`, `@md`, `@lg` — container size variants (mobile-first)
+- `@max-sm`, `@max-md` — max container size
+- `@container/{name}` + `@sm/{name}:` — named containers
+- `@min-[475px]`, `@max-[960px]` — arbitrary container sizes
+
+Container sizes: @3xs (16rem) through @7xl (80rem)
+
+---
+title: Dark mode
+description: Using the dark variant to style for dark mode.
+url: "https://tailwindcss.com/docs/dark-mode"
+---
+
+# Dark mode
+
+## Default
+
+Uses `prefers-color-scheme: dark` media query.
+
+```html
+<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white"></div>
+```
+
+## Manual toggle (class)
+
+```css
+@custom-variant dark (&:where(.dark, .dark *));
+```
+
+```html
+<html class="dark">
+  <div class="bg-white dark:bg-black">...</div>
+</html>
+```
+
+## Manual toggle (data attribute)
+
+```css
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+```
+
+```html
+<html data-theme="dark">...</html>
+```
+
+## Three-way toggle (light/dark/system)
+
+```js
+document.documentElement.classList.toggle(
+  "dark",
+  localStorage.theme === "dark" ||
+    (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+);
+```
+
+---
+title: Theme variables
+description: Design tokens and customizing the theme.
+url: "https://tailwindcss.com/docs/theme"
+---
+
+# Theme variables
+
+## @theme directive
+
+Define design tokens that generate utility classes:
+
+```css
+@import "tailwindcss";
+
+@theme {
+  --color-mint-500: oklch(0.72 0.11 178);
+  --font-display: "Satoshi", "sans-serif";
+  --breakpoint-3xl: 120rem;
+  --radius-xl: 0.75rem;
+}
+```
+
+## Theme variable namespaces
+
+| Namespace | Utilities |
+|-----------|-----------|
+| --color-* | bg-*, text-*, border-*, fill-*, stroke-*, etc. |
+| --font-* | font-sans, font-serif, font-mono |
+| --text-* | text-xs, text-sm, text-base, text-lg, etc. |
+| --font-weight-* | font-thin, font-normal, font-bold, etc. |
+| --tracking-* | tracking-tight, tracking-wide, etc. |
+| --leading-* | leading-tight, leading-relaxed, etc. |
+| --breakpoint-* | sm:*, md:*, lg:*, etc. |
+| --container-* | @sm:*, @md:*, max-w-*, etc. |
+| --spacing-* | p-*, m-*, gap-*, w-*, h-*, etc. |
+| --radius-* | rounded-sm, rounded-lg, etc. |
+| --shadow-* | shadow-sm, shadow-lg, etc. |
+| --inset-shadow-* | inset-shadow-xs, etc. |
+| --drop-shadow-* | drop-shadow-md, etc. |
+| --blur-* | blur-sm, blur-lg, etc. |
+| --perspective-* | perspective-near, etc. |
+| --aspect-* | aspect-video, aspect-square, etc. |
+| --ease-* | ease-in, ease-out, ease-in-out |
+| --animate-* | animate-spin, animate-pulse, etc. |
+
+## Customizing theme
+
+Extend: Add new variables in @theme
+Override: Redefine variable in @theme
+Replace namespace: `--color-*: initial;` then define new colors
+Custom theme: `--*: initial;` then define all from scratch
+
+## Using theme variables in CSS
+
+```css
+.my-element {
+  color: var(--color-gray-700);
+  font-size: var(--text-base);
+  padding: --spacing(4);
+}
+```
+
+## Functions
+
+- `--spacing(n)` — calc(var(--spacing) * n)
+- `--alpha(color / opacity)` — color-mix for opacity
+
+---
+title: Adding custom styles
+description: Arbitrary values, custom CSS, utilities, variants.
+url: "https://tailwindcss.com/docs/adding-custom-styles"
+---
+
+# Adding custom styles
+
+## Arbitrary values
+
+```html
+<div class="top-[117px] bg-[#bada55] text-[22px] before:content-['Festivus']"></div>
+<div class="fill-(--my-brand-color)"></div>
+```
+
+## Arbitrary variants
+
+```html
+<li class="lg:[&:nth-child(-n+3)]:hover:underline">item</li>
+```
+
+## Handling whitespace
+
+Use underscore `_` for spaces: `grid-cols-[1fr_500px_2fr]`
+Escape underscore: `before:content-['hello\_world']`
+
+## Resolving ambiguities
+
+```html
+<div class="text-(length:--my-var)"></div>  <!-- font-size -->
+<div class="text-(color:--my-var)"></div>   <!-- color -->
+```
+
+## Custom CSS layers
+
+```css
+@layer base {
+  h1 { font-size: var(--text-2xl); }
+}
+
+@layer components {
+  .card {
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: --spacing(6);
+  }
+}
+```
+
+## @variant in custom CSS
+
+```css
+.my-element {
+  background: white;
+  @variant dark { background: black; }
+  @variant dark {
+    @variant hover { background: gray; }
+  }
+}
+```
+
+## Custom utilities
+
+```css
+@utility content-auto {
+  content-visibility: auto;
+}
+
+@utility scrollbar-hidden {
+  &::-webkit-scrollbar { display: none; }
+}
+
+@utility tab-* {
+  tab-size: --value(--tab-size-*);
+}
+```
+
+## Custom variants
+
+```css
+@custom-variant theme-midnight (&:where([data-theme="midnight"] *));
+```
+
+---
+title: Detecting classes in source files
+description: How Tailwind scans and generates CSS.
+url: "https://tailwindcss.com/docs/detecting-classes-in-source-files"
+---
+
+# Detecting classes in source files
+
+## How it works
+
+Tailwind scans source files as plain text for tokens that look like class names, then generates CSS only for classes that exist.
+
+## Dynamic class names — DON'T
+
+```html
+<!-- BAD: Tailwind won't detect text-red-600 or text-green-600 -->
+<div class="text-{{ error ? 'red' : 'green' }}-600"></div>
+```
+
+## Dynamic class names — DO
+
+```html
+<!-- GOOD: Use complete class names -->
+<div class="{{ error ? 'text-red-600' : 'text-green-600' }}"></div>
+```
+
+```jsx
+// GOOD: Map props to complete class names
+const colorVariants = {
+  blue: "bg-blue-600 hover:bg-blue-500",
+  red: "bg-red-600 hover:bg-red-500",
+};
+return <button className={colorVariants[color]}>...</button>;
+```
+
+## @source directive
+
+```css
+@source "../node_modules/@acmecorp/ui-lib";
+@source not "../src/components/legacy";
+@import "tailwindcss" source("../src");
+@import "tailwindcss" source(none);
+```
+
+## Safelisting
+
+```css
+@source inline("underline");
+@source inline("{hover:,focus:,}underline");
+@source inline("{hover:,}bg-red-{50,{100..900..100},950}");
+@source not inline("{hover:,focus:,}bg-red-{50,{100..900..100},950}");
+```
+
+---
+title: Functions and directives
+description: Tailwind CSS directives and functions reference.
+url: "https://tailwindcss.com/docs/functions-and-directives"
+---
+
+# Functions and directives
+
+## Directives
+
+| Directive | Purpose |
+|-----------|---------|
+| @import | Import CSS including tailwindcss |
+| @theme | Define design tokens |
+| @source | Register source paths for scanning |
+| @utility | Add custom utilities |
+| @variant | Apply variant in custom CSS |
+| @custom-variant | Add custom variants |
+| @apply | Inline utility classes in custom CSS |
+| @reference | Import for @apply/@variant without duplicating output |
+| @config | Load legacy tailwind.config.js (v3 compat) |
+| @plugin | Load legacy plugins (v3 compat) |
+
+## Functions
+
+| Function | Purpose |
+|----------|---------|
+| --spacing(n) | calc(var(--spacing) * n) |
+| --alpha(color / pct) | color-mix for opacity |
+| theme() | Deprecated — use var(--*) instead |
+
+## Layers
+
+```css
+@layer theme, base, components, utilities;
+```
+
+---
+title: Utility reference — Layout
+description: All Tailwind v4 layout utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Layout utilities
+
+## Display
+inline, block, inline-block, flow-root, flex, inline-flex, grid, inline-grid, contents, table, table-caption, table-cell, table-column, table-column-group, table-footer-group, table-header-group, table-row, table-row-group, hidden, sr-only, not-sr-only
+
+## Aspect ratio
+aspect-auto, aspect-square, aspect-video, aspect-4/3, aspect-3/2, aspect-16/9, aspect-3/4, aspect-2/3, aspect-9/16
+
+## Columns
+columns-1, columns-2, columns-3, columns-4, columns-5, columns-6, columns-7, columns-8, columns-9, columns-auto, columns-3xs, columns-2xs, columns-xs, columns-sm, columns-md, columns-lg, columns-xl, columns-2xl, columns-3xl
+
+## Break
+break-after-auto, break-before-auto, break-inside-auto, break-after-avoid, break-before-avoid, break-inside-avoid, break-after-all, break-before-all, break-inside-avoid-page, break-after-page, break-before-page, break-inside-avoid-column, break-after-column, break-before-column
+
+## Box
+box-border, box-content, box-decoration-slice, box-decoration-clone
+
+## Float & clear
+float-start, float-end, float-right, float-left, float-none, clear-start, clear-end, clear-left, clear-right, clear-both, clear-none
+
+## Isolation
+isolate, isolate-auto
+
+## Object fit & position
+object-contain, object-cover, object-fill, object-none, object-scale-down, object-bottom, object-center, object-left, object-left-bottom, object-left-top, object-right, object-right-bottom, object-right-top, object-top
+
+## Overflow
+overflow-auto, overflow-hidden, overflow-clip, overflow-visible, overflow-scroll, overflow-x-auto, overflow-y-auto, overflow-x-hidden, overflow-y-hidden, overflow-x-clip, overflow-y-clip, overflow-x-visible, overflow-y-visible, overflow-x-scroll, overflow-y-scroll
+
+## Overscroll
+overscroll-auto, overscroll-contain, overscroll-none, overscroll-x-auto, overscroll-y-auto, overscroll-x-contain, overscroll-y-contain, overscroll-x-none, overscroll-y-none
+
+## Position
+static, fixed, absolute, relative, sticky
+
+## Inset (top, right, bottom, left)
+inset-0, inset-x-0, inset-y-0, inset-px, inset-auto, top-0, right-0, bottom-0, left-0, top-auto, right-auto, bottom-auto, left-auto
+
+## Visibility
+visible, invisible, collapse
+
+## Z-index
+z-0, z-10, z-20, z-30, z-40, z-50, z-auto
+
+---
+title: Utility reference — Flexbox & Grid
+description: All Tailwind v4 flexbox and grid utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Flexbox & Grid utilities
+
+## Flex basis
+basis-0, basis-1, basis-2, basis-3, basis-4, basis-5, basis-6, basis-7, basis-8, basis-9, basis-10, basis-11, basis-12, basis-14, basis-16, basis-20, basis-24, basis-28, basis-32, basis-36, basis-40, basis-44, basis-48, basis-52, basis-56, basis-60, basis-64, basis-72, basis-80, basis-96, basis-auto, basis-px, basis-0.5, basis-1.5, basis-2.5, basis-3.5, basis-1/2, basis-1/3, basis-2/3, basis-1/4, basis-2/4, basis-3/4, basis-1/5, basis-2/5, basis-3/5, basis-4/5, basis-1/6, basis-2/6, basis-3/6, basis-4/6, basis-5/6, basis-1/12, basis-2/12, basis-3/12, basis-4/12, basis-5/12, basis-6/12, basis-7/12, basis-8/12, basis-9/12, basis-10/12, basis-11/12, basis-full
+
+## Flex direction
+flex-row, flex-row-reverse, flex-col, flex-col-reverse
+
+## Flex wrap
+flex-wrap, flex-wrap-reverse, flex-nowrap
+
+## Flex
+flex-1, flex-auto, flex-initial, flex-none
+
+## Flex grow
+grow, grow-0
+
+## Flex shrink
+shrink, shrink-0
+
+## Order
+order-1, order-2, order-3, order-4, order-5, order-6, order-7, order-8, order-9, order-10, order-11, order-12, order-first, order-last, order-none
+
+## Grid template columns
+grid-cols-1, grid-cols-2, grid-cols-3, grid-cols-4, grid-cols-5, grid-cols-6, grid-cols-7, grid-cols-8, grid-cols-9, grid-cols-10, grid-cols-11, grid-cols-12, grid-cols-none, grid-cols-subgrid, grid-cols-[...]
+
+## Grid column
+col-auto, col-span-1, col-span-2, col-span-3, col-span-4, col-span-5, col-span-6, col-span-7, col-span-8, col-span-9, col-span-10, col-span-11, col-span-12, col-span-full, col-start-1, col-start-2, col-start-auto, col-end-1, col-end-2, col-end-auto
+
+## Grid template rows
+grid-rows-1, grid-rows-2, grid-rows-3, grid-rows-4, grid-rows-5, grid-rows-6, grid-rows-none, grid-rows-subgrid
+
+## Grid row
+row-auto, row-span-1, row-span-2, row-span-3, row-span-4, row-span-5, row-span-6, row-span-full, row-start-1, row-start-auto, row-end-1, row-end-auto
+
+## Grid auto flow
+grid-flow-row, grid-flow-col, grid-flow-dense, grid-flow-row-dense, grid-flow-col-dense
+
+## Grid auto columns/rows
+auto-cols-auto, auto-cols-min, auto-cols-max, auto-cols-fr, auto-rows-auto, auto-rows-min, auto-rows-max, auto-rows-fr
+
+## Gap
+gap-0, gap-1, gap-2, gap-3, gap-4, gap-5, gap-6, gap-7, gap-8, gap-9, gap-10, gap-11, gap-12, gap-14, gap-16, gap-20, gap-24, gap-28, gap-32, gap-36, gap-40, gap-44, gap-48, gap-52, gap-56, gap-60, gap-64, gap-72, gap-80, gap-96, gap-px, gap-0.5, gap-1.5, gap-2.5, gap-3.5, gap-x-*, gap-y-*
+
+## Justify content
+justify-normal, justify-start, justify-end, justify-center, justify-between, justify-around, justify-evenly, justify-stretch
+
+## Justify items
+justify-items-start, justify-items-end, justify-items-center, justify-items-stretch, justify-items-baseline
+
+## Justify self
+justify-self-auto, justify-self-start, justify-self-end, justify-self-center, justify-self-stretch, justify-self-baseline
+
+## Align content
+content-normal, content-center, content-start, content-end, content-between, content-around, content-evenly, content-baseline, content-stretch
+
+## Align items
+items-start, items-end, items-center, items-baseline, items-stretch
+
+## Align self
+self-auto, self-start, self-end, self-center, self-stretch, self-baseline
+
+## Place content/items/self
+place-content-*, place-items-*, place-self-*
+
+---
+title: Utility reference — Spacing
+description: All Tailwind v4 spacing utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Spacing utilities
+
+## Padding
+p-0, p-1, p-2, p-3, p-4, p-5, p-6, p-7, p-8, p-9, p-10, p-11, p-12, p-14, p-16, p-20, p-24, p-28, p-32, p-36, p-40, p-44, p-48, p-52, p-56, p-60, p-64, p-72, p-80, p-96, p-px, p-0.5, p-1.5, p-2.5, p-3.5, px-*, py-*, pt-*, pr-*, pb-*, pl-*, ps-*, pe-*
+
+## Margin
+m-0, m-1, m-2, m-3, m-4, m-5, m-6, m-7, m-8, m-9, m-10, m-11, m-12, m-14, m-16, m-20, m-24, m-28, m-32, m-36, m-40, m-44, m-48, m-52, m-56, m-60, m-64, m-72, m-80, m-96, m-px, m-0.5, m-1.5, m-2.5, m-3.5, m-auto, mx-*, my-*, mt-*, mr-*, mb-*, ml-*, ms-*, me-*
+
+Negative: -m-*, -mx-*, -my-*, -mt-*, -mr-*, -mb-*, -ml-*
+
+---
+title: Utility reference — Sizing
+description: All Tailwind v4 sizing utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Sizing utilities
+
+## Width
+w-0, w-1, w-2, w-3, w-4, w-5, w-6, w-7, w-8, w-9, w-10, w-11, w-12, w-14, w-16, w-20, w-24, w-28, w-32, w-36, w-40, w-44, w-48, w-52, w-56, w-60, w-64, w-72, w-80, w-96, w-auto, w-px, w-0.5, w-1.5, w-2.5, w-3.5, w-1/2, w-1/3, w-2/3, w-1/4, w-2/4, w-3/4, w-1/5, w-2/5, w-3/5, w-4/5, w-1/6, w-2/6, w-3/6, w-4/6, w-5/6, w-1/12, w-2/12, w-3/12, w-4/12, w-5/12, w-6/12, w-7/12, w-8/12, w-9/12, w-10/12, w-11/12, w-full, w-screen, w-min, w-max, w-fit, w-svw, w-lvw, w-dvw
+
+## Min/Max width
+min-w-0, min-w-full, min-w-min, min-w-max, min-w-fit, max-w-0, max-w-3xs, max-w-2xs, max-w-xs, max-w-sm, max-w-md, max-w-lg, max-w-xl, max-w-2xl, max-w-3xl, max-w-4xl, max-w-5xl, max-w-6xl, max-w-7xl, max-w-full, max-w-min, max-w-max, max-w-fit, max-w-prose, max-w-screen-sm, max-w-screen-md, max-w-screen-lg, max-w-screen-xl, max-w-screen-2xl
+
+## Height
+h-0, h-1, h-2, h-3, h-4, h-5, h-6, h-7, h-8, h-9, h-10, h-11, h-12, h-14, h-16, h-20, h-24, h-28, h-32, h-36, h-40, h-44, h-48, h-52, h-56, h-60, h-64, h-72, h-80, h-96, h-auto, h-px, h-0.5, h-1.5, h-2.5, h-3.5, h-1/2, h-1/3, h-2/3, h-1/4, h-2/4, h-3/4, h-1/5, h-2/5, h-3/5, h-4/5, h-1/6, h-2/6, h-3/6, h-4/6, h-5/6, h-full, h-screen, h-min, h-max, h-fit, h-svh, h-lvw, h-dvh
+
+## Min/Max height
+min-h-0, min-h-full, min-h-screen, min-h-svh, min-h-lvw, min-h-dvw, min-h-min, min-h-max, min-h-fit, max-h-0, max-h-3xs, max-h-2xs, max-h-xs, max-h-sm, max-h-md, max-h-lg, max-h-xl, max-h-2xl, max-h-3xl, max-h-4xl, max-h-5xl, max-h-6xl, max-h-7xl, max-h-full, max-h-screen, max-h-svh, max-h-lvw, max-h-dvw, max-h-min, max-h-max, max-h-fit
+
+## Size (width + height)
+size-0, size-1, size-2, size-3, size-4, size-5, size-6, size-7, size-8, size-9, size-10, size-11, size-12, size-14, size-16, size-20, size-24, size-28, size-32, size-36, size-40, size-44, size-48, size-52, size-56, size-60, size-64, size-72, size-80, size-96, size-auto, size-px, size-0.5, size-1.5, size-2.5, size-3.5, size-1/2, size-1/3, size-2/3, size-1/4, size-2/4, size-3/4, size-full, size-min, size-max, size-fit
+
+## Inline/block size
+min-w-*, max-w-*, w-* → inline-size variants: min-inline-size-*, max-inline-size-*, inline-size-*
+min-h-*, max-h-*, h-* → block-size variants: min-block-size-*, max-block-size-*, block-size-*
+
+---
+title: Utility reference — Typography
+description: All Tailwind v4 typography utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Typography utilities
+
+## Font family
+font-sans, font-serif, font-mono, font-*
+
+## Font size
+text-xs, text-sm, text-base, text-lg, text-xl, text-2xl, text-3xl, text-4xl, text-5xl, text-6xl, text-7xl, text-8xl, text-9xl
+
+Modifier for line-height: text-base/6, text-lg/7, text-xl/8, etc.
+
+## Font smoothing
+antialiased, subpixel-antialiased
+
+## Font style
+italic, not-italic
+
+## Font weight
+font-thin, font-extralight, font-light, font-normal, font-medium, font-semibold, font-bold, font-extrabold, font-black
+
+## Font stretch
+font-ultra-condensed, font-extra-condensed, font-condensed, font-semi-condensed, font-normal, font-semi-expanded, font-expanded, font-extra-expanded, font-ultra-expanded
+
+## Letter spacing
+tracking-tighter, tracking-tight, tracking-normal, tracking-wide, tracking-wider, tracking-widest
+
+## Line height
+leading-none, leading-tight, leading-snug, leading-normal, leading-relaxed, leading-loose, leading-3, leading-4, leading-5, leading-6, leading-7, leading-8, leading-9, leading-10
+
+## Line clamp
+line-clamp-1, line-clamp-2, line-clamp-3, line-clamp-none
+
+## List style
+list-none, list-disc, list-decimal, list-inside, list-outside
+
+## Text align
+text-left, text-center, text-right, text-justify, text-start, text-end
+
+## Text color
+text-{color}-{shade}, text-inherit, text-current, text-transparent
+
+## Text decoration
+underline, overline, line-through, no-underline, decoration-*, decoration-solid, decoration-double, decoration-dotted, decoration-dashed, decoration-wavy, underline-offset-*
+
+## Text transform
+uppercase, lowercase, capitalize, normal-case
+
+## Text overflow
+truncate, text-ellipsis, text-clip
+
+## Text wrap
+text-wrap, text-nowrap, text-balance, text-pretty
+
+## Text indent
+indent-0, indent-1, indent-2, indent-3, indent-4, indent-5, indent-6, indent-7, indent-8, indent-9, indent-10, indent-11, indent-12, indent-px, indent-0.5, indent-1.5, indent-2.5, indent-3.5
+
+## Vertical align
+align-baseline, align-top, align-middle, align-bottom, align-text-top, align-text-bottom, align-sub, align-super
+
+## White space
+whitespace-normal, whitespace-nowrap, whitespace-pre, whitespace-pre-line, whitespace-pre-wrap, whitespace-break-spaces
+
+## Word break
+break-normal, break-words, break-all, break-keep
+
+## Overflow wrap
+break-words, break-normal
+
+## Hyphens
+hyphens-none, hyphens-manual, hyphens-auto
+
+## Content (pseudo-elements)
+content-none, content-['...']
+
+---
+title: Utility reference — Backgrounds
+description: All Tailwind v4 background utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Background utilities
+
+## Background attachment
+bg-fixed, bg-local, bg-scroll
+
+## Background clip
+bg-clip-border, bg-clip-padding, bg-clip-content, bg-clip-text
+
+## Background color
+bg-{color}-{shade}, bg-inherit, bg-current, bg-transparent
+
+## Background image
+bg-none, bg-gradient-to-t, bg-gradient-to-tr, bg-gradient-to-r, bg-gradient-to-br, bg-gradient-to-b, bg-gradient-to-bl, bg-gradient-to-l, bg-gradient-to-tl, bg-gradient-to-b from-* via-* to-*
+
+## Background origin
+bg-origin-border, bg-origin-padding, bg-origin-content
+
+## Background position
+bg-bottom, bg-center, bg-left, bg-left-bottom, bg-left-top, bg-right, bg-right-bottom, bg-right-top, bg-top
+
+## Background repeat
+bg-repeat, bg-no-repeat, bg-repeat-x, bg-repeat-y, bg-repeat-round, bg-repeat-space
+
+## Background size
+bg-auto, bg-cover, bg-contain, bg-*
+
+---
+title: Utility reference — Borders
+description: All Tailwind v4 border utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Border utilities
+
+## Border radius
+rounded-none, rounded-sm, rounded, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-3xl, rounded-4xl, rounded-full, rounded-ss-*, rounded-se-*, rounded-ee-*, rounded-es-*, rounded-s-*, rounded-e-*, rounded-t-*, rounded-r-*, rounded-b-*, rounded-l-*, rounded-ss-none, rounded-se-none, etc.
+
+## Border width
+border-0, border-2, border-4, border-8, border, border-x-*, border-y-*, border-s-*, border-e-*, border-t-*, border-r-*, border-b-*, border-l-*
+
+## Border color
+border-{color}-{shade}, border-inherit, border-current, border-transparent
+
+## Border style
+border-solid, border-dashed, border-dotted, border-double, border-hidden, border-none
+
+## Outline
+outline-none, outline, outline-0, outline-1, outline-2, outline-4, outline-8, outline-{color}, outline-offset-0, outline-offset-1, outline-offset-2, outline-offset-4, outline-offset-8
+
+---
+title: Utility reference — Effects
+description: All Tailwind v4 effect utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Effects utilities
+
+## Box shadow
+shadow-2xs, shadow-xs, shadow-sm, shadow-md, shadow-lg, shadow-xl, shadow-2xl, shadow-inner, shadow-none, shadow-{color}
+
+## Text shadow
+text-shadow-2xs, text-shadow-xs, text-shadow-sm, text-shadow-md, text-shadow-lg, text-shadow-none
+
+## Opacity
+opacity-0, opacity-5, opacity-10, opacity-20, opacity-25, opacity-30, opacity-40, opacity-50, opacity-60, opacity-70, opacity-75, opacity-80, opacity-90, opacity-95, opacity-100
+
+## Mix blend mode
+mix-blend-normal, mix-blend-multiply, mix-blend-screen, mix-blend-overlay, mix-blend-darken, mix-blend-lighten, mix-blend-color-dodge, mix-blend-color-burn, mix-blend-hard-light, mix-blend-soft-light, mix-blend-difference, mix-blend-exclusion, mix-blend-hue, mix-blend-saturation, mix-blend-color, mix-blend-luminosity, mix-blend-plus-darker, mix-blend-plus-lighter
+
+## Background blend mode
+bg-blend-normal, bg-blend-multiply, bg-blend-screen, bg-blend-overlay, bg-blend-darken, bg-blend-lighten, bg-blend-color-dodge, bg-blend-color-burn, bg-blend-hard-light, bg-blend-soft-light, bg-blend-difference, bg-blend-exclusion, bg-blend-hue, bg-blend-saturation, bg-blend-color, bg-blend-luminosity
+
+## Mask
+mask-none, mask-clip-border, mask-clip-padding, mask-clip-content, mask-clip-text, mask-clip-fill-box, mask-clip-stroke-box, mask-clip-view-box, mask-composite-add, mask-composite-subtract, mask-composite-intersect, mask-composite-exclude, mask-mode-match, mask-mode-luminance, mask-mode-alpha, mask-origin-border, mask-origin-padding, mask-origin-content, mask-origin-fill-box, mask-origin-stroke-box, mask-origin-view-box, mask-repeat-repeat, mask-repeat-no-repeat, mask-repeat-repeat-x, mask-repeat-repeat-y, mask-repeat-repeat-space, mask-repeat-repeat-round, mask-position-*, mask-size-auto, mask-size-cover, mask-size-contain, mask-type-luminance, mask-type-alpha
+
+---
+title: Utility reference — Filters
+description: All Tailwind v4 filter utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Filter utilities
+
+## Filter
+blur-none, blur-sm, blur-md, blur-lg, blur-xl, blur-2xl, blur-3xl, blur-px, brightness-0, brightness-50, brightness-75, brightness-90, brightness-95, brightness-100, brightness-105, brightness-110, brightness-125, brightness-150, brightness-200, contrast-0, contrast-50, contrast-75, contrast-100, contrast-125, contrast-150, contrast-200, drop-shadow-2xs, drop-shadow-xs, drop-shadow-sm, drop-shadow-md, drop-shadow-lg, drop-shadow-xl, drop-shadow-2xl, drop-shadow-none, grayscale-0, grayscale, hue-rotate-0, hue-rotate-15, hue-rotate-30, hue-rotate-60, hue-rotate-90, hue-rotate-180, invert-0, invert, saturate-0, saturate-50, saturate-100, saturate-150, saturate-200, sepia-0, sepia
+
+## Backdrop filter
+backdrop-blur-none, backdrop-blur-sm, backdrop-blur-md, backdrop-blur-lg, backdrop-blur-xl, backdrop-blur-2xl, backdrop-blur-3xl, backdrop-blur-px, backdrop-brightness-*, backdrop-contrast-*, backdrop-grayscale-0, backdrop-grayscale, backdrop-hue-rotate-*, backdrop-invert-0, backdrop-invert, backdrop-opacity-*, backdrop-saturate-0, backdrop-saturate-50, backdrop-saturate-100, backdrop-saturate-150, backdrop-saturate-200, backdrop-sepia-0, backdrop-sepia
+
+---
+title: Utility reference — Transitions & Animation
+description: All Tailwind v4 transition and animation utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Transitions & Animation utilities
+
+## Transition property
+transition-none, transition-all, transition, transition-colors, transition-opacity, transition-shadow, transition-transform
+
+## Transition duration
+duration-0, duration-75, duration-100, duration-150, duration-200, duration-300, duration-500, duration-700, duration-1000
+
+## Transition timing
+ease-linear, ease-in, ease-out, ease-in-out, ease-*
+
+## Transition delay
+delay-0, delay-75, delay-100, delay-150, delay-200, delay-300, delay-500, delay-700, delay-1000
+
+## Animation
+animate-none, animate-spin, animate-ping, animate-pulse, animate-bounce, animate-*
+
+---
+title: Utility reference — Transforms
+description: All Tailwind v4 transform utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Transform utilities
+
+## Transform
+transform, transform-gpu, transform-none
+
+## Transform origin
+origin-center, origin-top, origin-top-right, origin-right, origin-bottom-right, origin-bottom, origin-bottom-left, origin-left, origin-top-left
+
+## Scale
+scale-0, scale-50, scale-75, scale-90, scale-95, scale-100, scale-105, scale-110, scale-125, scale-150, scale-x-*, scale-y-*
+
+## Rotate
+rotate-0, rotate-1, rotate-2, rotate-3, rotate-6, rotate-12, rotate-45, rotate-90, rotate-180, -rotate-180, -rotate-90, -rotate-45, -rotate-12, -rotate-6, -rotate-3, -rotate-2, -rotate-1
+
+## Translate
+translate-x-0, translate-x-1, translate-x-2, translate-x-3, translate-x-4, translate-x-5, translate-x-6, translate-x-7, translate-x-8, translate-x-9, translate-x-10, translate-x-11, translate-x-12, translate-x-14, translate-x-16, translate-x-20, translate-x-24, translate-x-28, translate-x-32, translate-x-36, translate-x-40, translate-x-44, translate-x-48, translate-x-52, translate-x-56, translate-x-60, translate-x-64, translate-x-72, translate-x-80, translate-x-96, translate-x-px, translate-x-0.5, translate-x-1.5, translate-x-2.5, translate-x-3.5, translate-x-1/2, translate-x-full, -translate-x-*, translate-y-*, -translate-y-*
+
+## Skew
+skew-x-0, skew-x-1, skew-x-2, skew-x-3, skew-x-6, skew-x-12, -skew-x-*, skew-y-*, -skew-y-*
+
+## Perspective
+perspective-none, perspective-dramatic, perspective-near, perspective-normal, perspective-midrange, perspective-distant
+
+## Backface visibility
+backface-visible, backface-hidden
+
+---
+title: Utility reference — Interactivity
+description: All Tailwind v4 interactivity utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Interactivity utilities
+
+## Accent color
+accent-{color}-{shade}, accent-auto
+
+## Appearance
+appearance-none, appearance-auto
+
+## Caret color
+caret-{color}-{shade}, caret-inherit, caret-current, caret-transparent
+
+## Color scheme
+color-scheme-light, color-scheme-dark, color-scheme-normal
+
+## Cursor
+cursor-auto, cursor-default, cursor-pointer, cursor-wait, cursor-text, cursor-move, cursor-help, cursor-not-allowed, cursor-none, cursor-context-menu, cursor-progress, cursor-cell, cursor-crosshair, cursor-vertical-text, cursor-alias, cursor-copy, cursor-no-drop, cursor-grab, cursor-grabbing, cursor-all-scroll, cursor-col-resize, cursor-row-resize, cursor-n-resize, cursor-e-resize, cursor-s-resize, cursor-w-resize, cursor-ne-resize, cursor-nw-resize, cursor-se-resize, cursor-sw-resize, cursor-ew-resize, cursor-ns-resize, cursor-nesw-resize, cursor-nwse-resize, cursor-zoom-in, cursor-zoom-out
+
+## Pointer events
+pointer-events-none, pointer-events-auto
+
+## Resize
+resize-none, resize-y, resize-x, resize
+
+## Scroll behavior
+scroll-auto, scroll-smooth
+
+## Scroll margin/padding
+scroll-m-0, scroll-m-1, scroll-m-2, scroll-m-3, scroll-m-4, scroll-m-5, scroll-m-6, scroll-m-7, scroll-m-8, scroll-m-9, scroll-m-10, scroll-m-11, scroll-m-12, scroll-m-14, scroll-m-16, scroll-m-20, scroll-m-24, scroll-m-28, scroll-m-32, scroll-m-36, scroll-m-40, scroll-m-44, scroll-m-48, scroll-m-52, scroll-m-56, scroll-m-60, scroll-m-64, scroll-m-72, scroll-m-80, scroll-m-96, scroll-m-px, scroll-m-0.5, scroll-m-1.5, scroll-m-2.5, scroll-m-3.5, scroll-mx-*, scroll-my-*, scroll-mt-*, scroll-mr-*, scroll-mb-*, scroll-ml-*, scroll-ms-*, scroll-me-*, scroll-p-*, scroll-px-*, scroll-py-*, scroll-pt-*, scroll-pr-*, scroll-pb-*, scroll-pl-*, scroll-ps-*, scroll-pe-*
+
+## Scroll snap
+snap-start, snap-end, snap-center, snap-align-none, snap-normal, snap-always, snap-none, snap-x, snap-y, snap-both, snap-mandatory, snap-proximity, snap-none
+
+## Touch action
+touch-auto, touch-none, touch-pan-x, touch-pan-left, touch-pan-right, touch-pan-y, touch-pan-up, touch-pan-down, touch-pinch-zoom, touch-manipulation
+
+## User select
+select-none, select-text, select-all, select-auto
+
+## Will change
+will-change-auto, will-change-scroll, will-change-contents, will-change-transform
+
+---
+title: Utility reference — SVG
+description: All Tailwind v4 SVG utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# SVG utilities
+
+## Fill
+fill-none, fill-{color}-{shade}, fill-inherit, fill-current, fill-transparent
+
+## Stroke
+stroke-none, stroke-{color}-{shade}, stroke-inherit, stroke-current, stroke-transparent
+
+## Stroke width
+stroke-0, stroke-1, stroke-2
+
+---
+title: Utility reference — Accessibility
+description: All Tailwind v4 accessibility utilities.
+url: "https://tailwindcss.com/docs"
+---
+
+# Accessibility utilities
+
+## Forced color adjust
+forced-color-adjust-auto, forced-color-adjust-none
+
+## Screen reader
+sr-only, not-sr-only
