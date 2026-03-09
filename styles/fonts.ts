@@ -9,3 +9,5 @@ export const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
