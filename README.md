@@ -1,4 +1,4 @@
-## Tổng quan dự án
+# Tổng quan dự án
 
 **cci-nextjs-modern** là bộ khởi tạo (boilerplate) Next.js 16 (App Router) với React 19, Tailwind CSS 4 và một số thư viện UI/state hiện đại, được thiết kế theo hướng **clean architecture**:
 
@@ -111,6 +111,30 @@
     - Cần pagination/infinite scroll.
   - Dùng hooks như `useQuery`, `useMutation`, `useInfiniteQuery` trong **client components**.
   - Debug state query/mutation bằng Devtools.
+
+### Zod (`zod`)
+
+- **`zod`**: thư viện định nghĩa schema + validate dữ liệu **TypeScript-first**, có static type inference.
+- **Best practice & khi dùng**:
+  - Định nghĩa **schema domain** (User, Product, Filter, Payload API, v.v.) ở các layer phù hợp (`lib/schemas/*`, `features/*/schemas.ts`).
+  - Validate **input**:
+    - Dữ liệu đến từ form (kết hợp với `react-hook-form` resolver).
+    - Dữ liệu đến từ API ngoài (đảm bảo data đúng shape trước khi dùng).
+    - Params từ URL, query string, search params.
+  - Tái sử dụng type: `z.infer<typeof schema>` để đảm bảo type domain **đồng nhất** giữa UI, server actions, API clients.
+  - Hạn chế duplicate type giữa TypeScript type & validation logic – luôn “đi từ schema Zod ra type” thay vì tự viết 2 lần.
+
+### React Hook Form (`react-hook-form`)
+
+- **`react-hook-form`**: thư viện quản lý form tối ưu performance, dùng hooks, không re-render toàn bộ form mỗi lần gõ.
+- **Best practice & khi dùng**:
+  - Tạo **form component** riêng trong `components/` hoặc `features/*/components/` (ví dụ: `LoginForm`, `ProfileForm`, `FilterForm`).
+  - Luôn define **schema validate** bằng Zod và dùng `zodResolver` (từ `@hookform/resolvers/zod`) để:
+    - Tách bạch phần UI form và kiểu dữ liệu/validate.
+    - Nhận error message cấu trúc rõ ràng, dễ map ra UI.
+  - Dùng `useForm` cho logic form local; **chỉ** đưa data form lên Zustand khi thực sự cần share nhiều màn hoặc giữ state qua nhiều bước wizard.
+  - Khi submit:
+    - Gọi **TanStack Query mutation** hoặc server action, dùng schema Zod để đảm bảo payload hợp lệ trước khi gọi API.
 
 ### Zustand (`zustand`)
 
