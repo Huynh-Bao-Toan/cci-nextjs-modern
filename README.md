@@ -146,6 +146,21 @@
   - Cần share state giữa nhiều components mà không muốn pass props sâu.
   - Không dùng cho data fetch từ API (trường hợp đó ưu tiên TanStack Query).
 
+### Vitest & Testing Library (unit test)
+
+- **`vitest`**: test runner hiện đại, API tương tự Jest nhưng tích hợp tốt với Vite.
+- **`@vitejs/plugin-react`**, **`vite-tsconfig-paths`**: cấu hình Vitest/Vite để hiểu JSX/TSX và alias từ `tsconfig.json` (như `@/components/...`). Xem `vitest.config.mts`:
+  - môi trường test là **`jsdom`**, phù hợp test component React
+
+- **`@testing-library/react`**, **`@testing-library/dom`**: bộ công cụ test UI theo hướng **user-centric** (query theo role, text, label…).
+- **`jsdom`**: giả lập DOM trong Node để test component React mà không cần browser thật.
+- **Best practice**:
+  - Viết test cho:
+    - Các page/feature quan trọng trong `app/` (ví dụ `app/__tests__/*`).
+    - Components tái sử dụng trong `components/` (ví dụ `components/__tests__/*`).
+  - Ưu tiên test theo **hành vi người dùng** (click, nhập input, text hiển thị) thay vì implementation detail.
+  - Sử dụng `pnpm test` để chạy toàn bộ test suite, tích hợp vào CI.
+
 ### ESLint, TypeScript và công cụ dev
 
 - **`typescript`**: typing, an toàn code.
