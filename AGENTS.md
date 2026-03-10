@@ -10,7 +10,7 @@ Before any Next.js work, find and read the relevant doc in `agents/next/llms-ful
 
 ## Shadcn ALWAYS read docs before coding
 
-Before any Shadcn work, find and read the relevant doc in `agents/shadcn/llms-full.txt`. Your training data is outdated — the docs are the source of truth.
+Before any Shadcn work, find and read the relevant doc in `agents/shadcn/llms.txt`. Your training data is outdated — the docs are the source of truth.
 
 <!-- END:shadcn-agent-rules -->
 
@@ -29,3 +29,11 @@ Before any Tailwind CSS work, find and read the relevant doc in `agents/tailwind
 Before any Zod work, find and read the relevant doc in `agents/zod/llms.txt`. Your training data is outdated — the docs are the source of truth.
 
 <!-- END:zod-agent-rules -->
+
+<!-- BEGIN:es-toolkit-agent-rules -->
+
+## es-toolkit: ALWAYS read docs before coding
+
+Before any es-toolkit work, find and read the relevant doc in `agents/es-toolkit/llms-full.txt`. Your training data is outdated — the docs are the source of truth.
+
+<!-- END:es-toolkit-agent-rules -->

@@ -136,6 +136,22 @@
   - Khi submit:
     - Gọi **TanStack Query mutation** hoặc server action, dùng schema Zod để đảm bảo payload hợp lệ trước khi gọi API.
 
+### es-toolkit (`es-toolkit`)
+
+- **`es-toolkit`**: thư viện utility JavaScript hiện đại, thay thế lodash với bundle nhỏ hơn (tới ~97%) và hiệu năng tốt hơn 2–3 lần.
+- **Các nhóm chức năng**:
+  - **Array**: `uniq`, `difference`, `groupBy`, `sortBy`, v.v.
+  - **Function**: `debounce`, `throttle`, `once`, `after`, v.v.
+  - **Math**: `sum`, `round`, `clamp`, v.v.
+  - **Object**: `pick`, `omit`, `deepMerge`, v.v.
+  - **Predicate**: `isNotNil`, `isPlainObject`, v.v.
+  - **Promise**: `delay`, `retry`, v.v.
+  - **String**: `snakeCase`, `camelCase`, `truncate`, v.v.
+- **Best practice & khi dùng**:
+  - Import theo subpath để tree-shaking tốt: `import { debounce } from 'es-toolkit/function'`, `import { pick } from 'es-toolkit/object'`.
+  - Dùng thay cho lodash khi cần: array/object/string manipulation, debounce/throttle, delay, type guards.
+  - Đặt logic dùng es-toolkit trong `lib/` hoặc hooks; tránh import trực tiếp trong component nếu có thể gom vào helper.
+
 ### Zustand (`zustand`)
 
 - **`zustand`**: state management cho **client state**/UI state.
