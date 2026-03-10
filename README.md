@@ -112,6 +112,42 @@
   - Dùng hooks như `useQuery`, `useMutation`, `useInfiniteQuery` trong **client components**.
   - Debug state query/mutation bằng Devtools.
 
+### Axios (`axios`)
+
+- **`axios`**: HTTP client (REST) hỗ trợ interceptors, timeout, baseURL, transform request/response.
+- **Khi dùng**:
+  - Khi bạn muốn một HTTP client thống nhất cho cả client/server (ví dụ gọi API nội bộ/3rd party), có interceptors cho auth/refresh token.
+  - Dùng làm “transport layer” dưới TanStack Query (tức `queryFn`/`mutationFn` gọi axios).
+- **Best practice & khi dùng**:
+  - Tạo 1 instance dùng chung trong `lib/http/*` (ví dụ `lib/http/axios.ts`) để cấu hình `baseURL`, headers, interceptors.
+  - Không gọi axios trực tiếp khắp nơi trong UI; ưu tiên đi qua:
+    - `lib/api/*` (các hàm gọi API), sau đó
+    - TanStack Query hooks để quản lý server state.
+  - Với Next App Router, cân nhắc phân tách:
+    - **Server-to-server** (Route Handler / Server Action) gọi axios với secret/token server.
+    - **Client** chỉ gọi những endpoint an toàn, hoặc gọi thông qua route handler.
+
+### nuqs (`nuqs`)
+
+- **`nuqs`**: quản lý state đồng bộ với **URL query string** (search params) trong Next.js.
+- **Khi dùng**:
+  - Filter/sort/pagination/search… mà bạn muốn:
+    - share link được,
+    - back/forward giữ đúng state,
+    - reload vẫn giữ state.
+- **Best practice**:
+  - Dùng nuqs cho state “URL-driven” (filters, tab, page, perPage) thay vì đưa vào Zustand.
+  - Kết hợp với TanStack Query: đưa queryKey phụ thuộc search params để caching đúng theo URL.
+
+### date-fns (`date-fns`)
+
+- **`date-fns`**: tiện ích xử lý ngày giờ theo kiểu functional, import theo hàm để bundle nhỏ.
+- **Khi dùng**:
+  - Format ngày giờ hiển thị UI, parse/compare/rounding, tính khoảng thời gian (relative time), v.v.
+- **Best practice**:
+  - Import theo hàm: `import { format, parseISO } from 'date-fns'` (tránh import cả package).
+  - Chuẩn hoá timezone/ISO string ở layer API/domain (ưu tiên lưu trữ dạng ISO), UI chỉ format/hiển thị.
+
 ### Zod (`zod`)
 
 - **`zod`**: thư viện định nghĩa schema + validate dữ liệu **TypeScript-first**, có static type inference.
