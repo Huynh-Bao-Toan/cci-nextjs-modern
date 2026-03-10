@@ -1,6 +1,14 @@
 # Tổng quan dự án
 
-**cci-nextjs-modern** là bộ khởi tạo (boilerplate) Next.js 16 (App Router) với React 19, Tailwind CSS 4 và một số thư viện UI/state hiện đại, được thiết kế theo hướng **clean architecture**:
+**cci-nextjs-modern – Mini Commerce Catalog** là một mini e-commerce catalog xây trên Next.js 16 (App Router) với React 19, Tailwind CSS 4 và các thư viện hiện đại, được thiết kế theo hướng **clean architecture** và **feature-first**. Mục tiêu là làm ví dụ “production-style” cho:
+
+- **Routing & App Router**
+- **Server Component vs Client Component**
+- **Data fetching & caching**
+- **Loading UI vs Streaming (Suspense)**
+- **URL-driven state (nuqs)**
+- **State management (TanStack Query + Zustand)**
+- **Performance & bundle hygiene**
 
 - **`app/`**: định nghĩa route, layout, entry UI.
 - **`components/`**: các UI components tái sử dụng (shadcn UI, button, form, v.v.).
