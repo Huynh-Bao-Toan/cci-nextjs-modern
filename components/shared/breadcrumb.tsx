@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -28,18 +29,21 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
       <ShadcnBreadcrumbList className="text-xs">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
+          const key = `${item.label}-${index}`;
+          const content =
+            item.href && !isLast ? (
+              <ShadcnBreadcrumbLink asChild>
+                <Link href={item.href}>{item.label}</Link>
+              </ShadcnBreadcrumbLink>
+            ) : (
+              <ShadcnBreadcrumbPage>{item.label}</ShadcnBreadcrumbPage>
+            );
 
           return (
-            <ShadcnBreadcrumbItem key={`${item.label}-${index}`}>
+            <Fragment key={key}>
               {index > 0 ? <ShadcnBreadcrumbSeparator /> : null}
-              {item.href && !isLast ? (
-                <ShadcnBreadcrumbLink asChild>
-                  <Link href={item.href}>{item.label}</Link>
-                </ShadcnBreadcrumbLink>
-              ) : (
-                <ShadcnBreadcrumbPage>{item.label}</ShadcnBreadcrumbPage>
-              )}
-            </ShadcnBreadcrumbItem>
+              <ShadcnBreadcrumbItem>{content}</ShadcnBreadcrumbItem>
+            </Fragment>
           );
         })}
       </ShadcnBreadcrumbList>

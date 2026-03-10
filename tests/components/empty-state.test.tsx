@@ -8,8 +8,8 @@ describe("EmptyState", () => {
   it("renders title and description", () => {
     render(<EmptyState title="No items" description="Try again later." />);
 
-    expect(screen.getByText("No items")).toBeInTheDocument();
-    expect(screen.getByText("Try again later.")).toBeInTheDocument();
+    expect(screen.getByText("No items")).toBeDefined();
+    expect(screen.getByText("Try again later.")).toBeDefined();
   });
 });
 

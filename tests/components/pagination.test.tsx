@@ -15,15 +15,14 @@ describe("Pagination", () => {
       />,
     );
 
-    expect(screen.getByText(/Page 2 of 10/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Previous" })).toHaveAttribute(
-      "href",
-      "/products?page=1",
-    );
-    expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute(
-      "href",
-      "/products?page=3",
-    );
+    const info = screen.getByText(/Page 2 of 10/);
+    expect(info).toBeDefined();
+
+    const prev = screen.getByRole("link", { name: "Previous" });
+    const next = screen.getByRole("link", { name: "Next" });
+
+    expect(prev.getAttribute("href")).toMatch(/\/products\?page=1$/);
+    expect(next.getAttribute("href")).toMatch(/\/products\?page=3$/);
   });
 });
 

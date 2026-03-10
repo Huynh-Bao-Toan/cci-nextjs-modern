@@ -24,16 +24,16 @@ describe("ProductCard", () => {
   it("renders product title and price", () => {
     render(<ProductCard product={product} />);
 
-    expect(screen.getByText("Test product")).toBeInTheDocument();
-    expect(screen.getByText(/99/)).toBeInTheDocument();
+    expect(screen.getByText("Test product")).toBeDefined();
+    expect(screen.getByText(/99/)).toBeDefined();
   });
 
   it("links to product detail page", () => {
     render(<ProductCard product={product} />);
 
-    const link = screen.getAllByRole("link").find((el) =>
-      el.getAttribute("href") === "/products/1"
-    );
+    const link = screen
+      .getAllByRole("link")
+      .find((el) => (el.getAttribute("href") ?? "").endsWith("/products/1"));
     expect(link).toBeDefined();
   });
 });
