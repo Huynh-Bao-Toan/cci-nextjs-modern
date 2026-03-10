@@ -250,3 +250,45 @@
 - **UI/client state dùng chung** → tạo store trong `stores/` với **Zustand**, import hook vào component client.
 - **UI component tái sử dụng** → tạo trong `components/ui/` (ưu tiên pattern shadcn + Tailwind + Radix).
 - **Logic thuần, không phụ thuộc UI** → đặt trong `lib/`.
+
+---
+
+## Environment variables (3 môi trường)
+
+Next.js tự động nạp biến môi trường theo `NODE_ENV` từ các file `.env*` (theo thứ tự ưu tiên):
+
+1. `process.env`
+2. `.env.$(NODE_ENV).local`
+3. `.env.local` (KHÔNG được load khi `NODE_ENV=test`)
+4. `.env.$(NODE_ENV)`
+5. `.env`
+
+Repo đã có sẵn các file ví dụ:
+
+- **Development (dev local)**: `.env.development.example`
+- **Production**: `.env.production.example`
+- **Test (UAT/BETA)**: `.env.test.example`
+- **Base defaults**: `.env.example`
+
+Lưu ý quan trọng:
+
+- Chỉ biến có prefix **`NEXT_PUBLIC_`** mới có thể dùng an toàn ở client. Các biến này sẽ được “inline” vào bundle khi `next build` (đổi env sau khi build sẽ không có tác dụng cho client).
+- Biến **không** có `NEXT_PUBLIC_` chỉ dùng ở server (Route Handlers, Server Components/Actions, v.v.).
+
+### Cách dùng nhanh (Windows PowerShell)
+
+- **Development (local)**:
+  - Copy `.env.development.example` → `.env.development.local` (hoặc `.env.local`)
+  - Chạy: `pnpm dev`
+
+- **Production (mô phỏng local)**:
+  - Copy `.env.production.example` → `.env.production.local`
+  - Chạy:
+    - `$env:NODE_ENV="production"; pnpm build`
+    - `$env:NODE_ENV="production"; pnpm start`
+
+- **Test (UAT/BETA)**:
+  - Copy `.env.test.example` → `.env.test` (và/hoặc `.env.test.local`)
+  - Chạy:
+    - `$env:NODE_ENV="test"; pnpm build`
+    - `$env:NODE_ENV="test"; pnpm start`
