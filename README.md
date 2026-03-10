@@ -161,6 +161,25 @@
   - Ưu tiên test theo **hành vi người dùng** (click, nhập input, text hiển thị) thay vì implementation detail.
   - Sử dụng `pnpm test` để chạy toàn bộ test suite, tích hợp vào CI.
 
+### Playwright (end-to-end test)
+
+- **`@playwright/test`**: framework E2E test chạy trên **trình duyệt thật** (Chromium, Firefox, WebKit) với API thân thiện.
+- Cấu hình chính nằm ở `playwright.config.ts`:
+  - `testDir: './tests'`: tất cả E2E test nằm trong thư mục `tests/` (ví dụ `tests/example.spec.ts`).
+  - Chạy song song (`fullyParallel: true`), retry tự động trên CI, reporter dạng HTML.
+  - Có sẵn cấu hình cho 3 browser chính: Desktop Chrome, Firefox, Safari.
+- **Các lệnh hữu ích (chạy trong root project)**:
+  - `pnpm exec playwright test`: chạy toàn bộ E2E tests.
+  - `pnpm exec playwright test --ui`: mở giao diện UI mode để xem/chạy test tương tác.
+  - `pnpm exec playwright test --project=chromium`: chỉ chạy trên Desktop Chrome.
+  - `pnpm exec playwright test example`: chỉ chạy file/nhóm test có tên `example`.
+  - `pnpm exec playwright test --debug`: chạy test ở debug mode (dừng từng bước, inspector).
+  - `pnpm exec playwright codegen`: auto generate test từ session duyệt web thực tế.
+- **Best practice & khi dùng**:
+  - Dùng cho **end-to-end flow** quan trọng: login, checkout, form nhiều bước, navigation chính.
+  - Giữ test E2E ở mức **ít nhưng chất lượng cao**; phần logic chi tiết nên test bằng unit/integration (Vitest + Testing Library).
+  - Kết hợp với `webServer` trong `playwright.config.ts` (khi cần) để tự start app trước khi chạy test E2E.
+
 ### ESLint, TypeScript và công cụ dev
 
 - **`typescript`**: typing, an toàn code.
