@@ -33,7 +33,7 @@ describe("product search params", () => {
     const parsed = parseProductSearchParams({
       q: "phone",
       unknown: "value",
-    } as any);
+    });
 
     expect(parsed.q).toBe("phone");
   });

@@ -14,6 +14,21 @@ export async function getProducts(params: ProductSearchParams) {
     return getSearchedProducts(params, searchParams);
   }
 
+  if (params.category) {
+    searchParams.set("limit", String(params.pageSize));
+    searchParams.set("skip", String((params.page - 1) * params.pageSize));
+
+    const raw = await httpGetJson<RawProductsResponse>(
+      `/products/category/${encodeURIComponent(params.category)}`,
+      {
+        searchParams,
+        cache: "force-cache",
+      },
+    );
+
+    return mapRawProductsResponse(raw, params.pageSize);
+  }
+
   searchParams.set("limit", String(params.pageSize));
   searchParams.set("skip", String((params.page - 1) * params.pageSize));
 

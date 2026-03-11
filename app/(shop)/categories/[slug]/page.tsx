@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { EmptyState } from "@/components/shared/empty-state";
 import { Pagination } from "@/components/shared/pagination";
@@ -10,26 +11,20 @@ import { getCategories } from "@/features/products/server/get-categories";
 import { getProducts } from "@/features/products/server/get-products";
 import { parseProductSearchParams } from "@/features/products/lib/product-query-params";
 
-type CategoryPageProps = {
-  params: { slug: string };
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
-
-export default async function CategoryPage({
-  params,
-  searchParams,
-}: CategoryPageProps) {
+export default async function CategoryPage(
+  props: PageProps<"/categories/[slug]">,
+) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
   const allCategories = await getCategories();
   const normalizedSlug = decodeURIComponent(params.slug);
 
   if (!allCategories.includes(normalizedSlug)) {
-    // Let the segment-level not-found handle this
-    throw new Error("Category not found");
+    notFound();
   }
 
-  const resolvedSearchParams = await searchParams;
   const parsedParams = parseProductSearchParams({
-    ...resolvedSearchParams,
+    ...searchParams,
     category: normalizedSlug,
   });
 

@@ -1,8 +1,12 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { getCategories } from "@/features/products/server/get-categories";
 
-export default function MarketingHomePage() {
+export default async function MarketingHomePage() {
+  const categories = (await getCategories()).filter(Boolean);
+  const featuredCategories = categories.slice(0, 8);
+
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-16 px-4 py-16 sm:px-6 lg:px-8">
       <section className="grid gap-10 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-center">
@@ -26,6 +30,23 @@ export default function MarketingHomePage() {
             <Button asChild variant="outline" size="lg">
               <Link href="/lab">Open performance lab</Link>
             </Button>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Popular categories
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {featuredCategories.map((slug) => (
+                <Link
+                  key={slug}
+                  href={`/categories/${encodeURIComponent(slug)}`}
+                  className="rounded-full border bg-card px-3 py-1 text-xs font-medium text-foreground transition hover:border-primary/50 hover:text-primary"
+                >
+                  {slug}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
         <div className="rounded-2xl border bg-card p-6 shadow-sm">
