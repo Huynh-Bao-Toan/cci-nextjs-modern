@@ -1,7 +1,6 @@
 import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ModeToggle } from "./mode-toggle";
 
 const navItems = [
   { href: "/products", label: "Products" },
@@ -33,24 +32,9 @@ export function AppHeader() {
               {item.label}
             </Link>
           ))}
-          <ThemeToggle />
+          <ModeToggle />
         </nav>
       </div>
     </header>
   );
 }
-
-function ThemeToggle() {
-  // Simple placeholder for now – will be upgraded later if needed.
-  return (
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      className="hidden sm:inline-flex"
-      aria-label="Theme toggle"
-    >
-      <span className="text-xs">⭘</span>
-    </Button>
-  );
-}
-
