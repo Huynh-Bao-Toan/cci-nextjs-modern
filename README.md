@@ -78,6 +78,17 @@
 - **Khi dùng**:
   - Tất cả phần UI, routing, server actions, metadata… đều dựa trên 2 thư viện này.
 
+### Boundary packages cho React Server Components (`client-only`, `server-only`)
+
+- **`client-only`**: đánh dấu module chỉ được import ở Client Components.
+- **`server-only`**: đánh dấu module chỉ được import ở Server Components/Route Handlers/Server Actions.
+- **Khi dùng**:
+  - Dùng `import 'client-only'` ở đầu các file util/hook phụ thuộc browser APIs (`window`, `document`, `localStorage`, v.v.) để tránh bị import nhầm sang server.
+  - Dùng `import 'server-only'` ở đầu các file chứa logic server, secrets, private env vars hoặc server-side data access để chặn import nhầm vào client bundle.
+- **Best practice**:
+  - Thêm boundary import ngay tại các module “gốc” trong `lib/`, `stores/`, `providers/` hoặc data layer để phát hiện sai kiến trúc sớm khi build.
+  - Kết hợp với quy ước thư mục rõ ràng (ví dụ: `lib/server/*`, `lib/client/*`) để maintain dễ hơn khi dự án lớn.
+
 ### Tailwind & hệ sinh thái UI
 
 - **`tailwindcss`**: utility-first CSS framework.
@@ -171,6 +182,16 @@
   - Dùng `useForm` cho logic form local; **chỉ** đưa data form lên Zustand khi thực sự cần share nhiều màn hoặc giữ state qua nhiều bước wizard.
   - Khi submit:
     - Gọi **TanStack Query mutation** hoặc server action, dùng schema Zod để đảm bảo payload hợp lệ trước khi gọi API.
+
+### Hook Form Resolvers (`@hookform/resolvers`)
+
+- **`@hookform/resolvers`**: adapter kết nối React Hook Form với các thư viện schema validator (phổ biến nhất là Zod).
+- **Khi dùng**:
+  - Dùng `zodResolver` từ `@hookform/resolvers/zod` để đưa Zod schema vào `useForm`.
+  - Chuẩn hoá validate ở schema layer, tránh lặp lại rule giữa UI và domain.
+- **Best practice**:
+  - Đặt schema gần domain/form (`lib/schemas/*` hoặc `features/*/schemas.ts`) và tái sử dụng cả cho form lẫn API payload validation.
+  - Ưu tiên dùng `z.infer<typeof schema>` để type của form luôn đồng bộ với rule validate.
 
 ### es-toolkit (`es-toolkit`)
 
