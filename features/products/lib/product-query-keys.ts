@@ -5,10 +5,8 @@ export const productQueryKeys = {
   list: (params: {
     q?: string;
     category?: string;
-    sort?: string;
     page?: number;
     pageSize?: number;
-    minRating?: number;
   }) => ["products", "list", params] as const,
   detail: (id: number | string) => ["products", "detail", { id }] as const,
   related: (id: number | string) => ["products", "related", { id }] as const,

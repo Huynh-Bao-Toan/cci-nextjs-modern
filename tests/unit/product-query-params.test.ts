@@ -10,7 +10,6 @@ describe("product search params", () => {
     const parsed = productSearchParamsSchema.parse({});
     expect(parsed.page).toBe(1);
     expect(parsed.pageSize).toBe(12);
-    expect(parsed.sort).toBe("relevance");
   });
 
   it("parses and coerces values from URL search params", () => {
@@ -18,15 +17,11 @@ describe("product search params", () => {
       q: "laptop",
       page: "2",
       pageSize: "24",
-      sort: "price-desc",
-      minRating: "4",
     });
 
     expect(parsed.q).toBe("laptop");
     expect(parsed.page).toBe(2);
     expect(parsed.pageSize).toBe(24);
-    expect(parsed.sort).toBe("price-desc");
-    expect(parsed.minRating).toBe(4);
   });
 
   it("ignores unknown params", () => {

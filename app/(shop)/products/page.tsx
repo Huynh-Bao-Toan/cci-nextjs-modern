@@ -83,18 +83,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 function buildProductsHref(params: {
   q?: string;
   category?: string;
-  sort?: string;
   page: number;
   pageSize?: number;
-  minRating?: number;
 }) {
   const url = new URL("/products", "http://localhost");
   if (params.q) url.searchParams.set("q", params.q);
   if (params.category) url.searchParams.set("category", params.category);
-  if (params.sort) url.searchParams.set("sort", params.sort);
-  if (params.minRating != null) {
-    url.searchParams.set("minRating", String(params.minRating));
-  }
   if (params.pageSize) {
     url.searchParams.set("pageSize", String(params.pageSize));
   }

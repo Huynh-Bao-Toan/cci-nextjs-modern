@@ -1,18 +1,10 @@
 import { z } from "zod";
 
-export const sortOptions = ["relevance", "price-asc", "price-desc", "rating-desc"] as const;
-
 export const productSearchParamsSchema = z.object({
   q: z.string().trim().optional(),
   category: z.string().trim().optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(48).default(12),
-  sort: z.enum(sortOptions).default("relevance"),
-  minRating: z
-    .coerce.number()
-    .min(0)
-    .max(5)
-    .optional(),
 });
 
 export type ProductSearchParams = z.infer<typeof productSearchParamsSchema>;
