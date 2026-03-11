@@ -27,9 +27,6 @@ export default async function MarketingHomePage() {
             <Button asChild size="lg">
               <Link href="/products">Start browsing products</Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/lab">Open performance lab</Link>
-            </Button>
           </div>
 
           <div className="space-y-3">
@@ -72,15 +69,6 @@ export default async function MarketingHomePage() {
                 favorites view.
               </dd>
             </div>
-            <div className="flex items-start justify-between gap-3">
-              <dt className="font-medium text-foreground">
-                Performance playground
-              </dt>
-              <dd className="max-w-xs text-right text-muted-foreground">
-                A lab page to compare server components, client components,
-                caching, and streaming behavior.
-              </dd>
-            </div>
           </dl>
         </div>
       </section>
@@ -115,22 +103,6 @@ export default async function MarketingHomePage() {
           </p>
           <span className="text-xs font-medium text-primary group-hover:underline">
             View favorites →
-          </span>
-        </Link>
-
-        <Link
-          href="/lab"
-          className="group rounded-xl border bg-card p-5 transition hover:border-primary/50 hover:shadow-sm"
-        >
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-primary">
-            Performance Lab
-          </h3>
-          <p className="mb-3 text-sm text-muted-foreground">
-            Inspect different rendering strategies, Suspense streaming, and
-            caching blocks in a single page.
-          </p>
-          <span className="text-xs font-medium text-primary group-hover:underline">
-            Open lab →
           </span>
         </Link>
       </section>

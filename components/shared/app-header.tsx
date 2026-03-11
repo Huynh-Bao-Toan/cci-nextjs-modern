@@ -5,7 +5,6 @@ import { ModeToggle } from "./mode-toggle";
 const navItems = [
   { href: "/products", label: "Products" },
   { href: "/favorites", label: "Favorites" },
-  { href: "/lab", label: "Lab" },
 ];
 
 export function AppHeader() {
