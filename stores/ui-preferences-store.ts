@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 type Theme = "light" | "dark" | "system";
 
 type UiPreferencesState = {
@@ -16,6 +18,7 @@ export const useUiPreferencesStore = create<UiPreferencesState>()(
     }),
     {
       name: "ui-preferences-store",
+      enabled: isDev,
     },
   ),
 );
