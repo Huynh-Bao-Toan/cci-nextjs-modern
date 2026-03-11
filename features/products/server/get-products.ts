@@ -1,3 +1,5 @@
+import "server-only";
+
 import { httpGetJson } from "@/lib/api/http";
 
 import type { RawProductsResponse } from "../api/products.types";

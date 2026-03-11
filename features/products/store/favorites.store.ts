@@ -1,9 +1,13 @@
 "use client";
 
+import "client-only";
+
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { devtools, persist, createJSONStorage } from "zustand/middleware";
 
 import type { Product } from "../api/products.types";
+
+const isDev = process.env.NODE_ENV !== "production";
 
 export type FavoriteProduct = Pick<
   Product,
@@ -23,34 +27,43 @@ type FavoritesActions = {
 type FavoritesStore = FavoritesState & FavoritesActions;
 
 export const useFavoritesStore = create<FavoritesStore>()(
-  persist(
-    (set, get) => ({
-      items: {},
-      toggleFavorite(product) {
-        const current = get().items;
-        if (current[product.id]) {
+  devtools(
+    persist(
+      (set, get) => ({
+        items: {},
+        toggleFavorite(product) {
+          const current = get().items;
+          if (current[product.id]) {
+            const next = { ...current };
+            delete next[product.id];
+            set({ items: next }, undefined, "favorites/toggleFavorite");
+            return;
+          }
+          set(
+            { items: { ...current, [product.id]: product } },
+            undefined,
+            "favorites/toggleFavorite",
+          );
+        },
+        removeFavorite(id) {
+          const current = get().items;
+          if (!current[id]) return;
           const next = { ...current };
-          delete next[product.id];
-          set({ items: next });
-          return;
-        }
-        set({ items: { ...current, [product.id]: product } });
+          delete next[id];
+          set({ items: next }, undefined, "favorites/removeFavorite");
+        },
+        clear() {
+          set({ items: {} }, undefined, "favorites/clear");
+        },
+      }),
+      {
+        name: "favorites-storage",
+        storage: createJSONStorage(() => localStorage),
       },
-      removeFavorite(id) {
-        const current = get().items;
-        if (!current[id]) return;
-        const next = { ...current };
-        delete next[id];
-        set({ items: next });
-      },
-      clear() {
-        set({ items: {} });
-      },
-    }),
+    ),
     {
-      name: "mini-commerce:favorites",
-      storage: createJSONStorage(() => localStorage),
+      name: "favorites-store",
+      enabled: isDev,
     },
   ),
 );
-
