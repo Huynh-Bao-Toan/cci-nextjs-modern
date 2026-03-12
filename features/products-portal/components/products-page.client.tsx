@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useQueryStates } from "nuqs"
 
 import type { Product } from "../domain/product.types"
@@ -8,7 +8,6 @@ import { toProductsSearchParams } from "../lib/products.url-state"
 import { productsUrlState } from "../lib/products.url-state"
 import { useCategoriesQuery } from "../hooks/use-categories-query"
 import { useProductsQuery } from "../hooks/use-products-query"
-import { useProductsUiStore } from "../store/products-ui.store"
 
 import { ProductsPortalSkeleton } from "./products-skeleton"
 import { ProductsToolbar } from "./products-toolbar"
@@ -31,19 +30,9 @@ export function ProductsPortalPage() {
   const categoriesQuery = useCategoriesQuery()
   const listQuery = useProductsQuery(params)
 
-  const openAddDialog = useProductsUiStore((s) => s.openAddDialog)
-  const editingProductId = useProductsUiStore((s) => s.editingProductId)
-  const deletingProductId = useProductsUiStore((s) => s.deletingProductId)
-
-  const selectedEditing = useMemo<Product | null>(() => {
-    if (!editingProductId) return null
-    return (listQuery.data?.items ?? []).find((p) => p.id === editingProductId) ?? null
-  }, [editingProductId, listQuery.data?.items])
-
-  const selectedDeleting = useMemo<Product | null>(() => {
-    if (!deletingProductId) return null
-    return (listQuery.data?.items ?? []).find((p) => p.id === deletingProductId) ?? null
-  }, [deletingProductId, listQuery.data?.items])
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
 
   if (categoriesQuery.isPending || listQuery.isPending) {
     return <ProductsPortalSkeleton />
@@ -71,7 +60,14 @@ export function ProductsPortalPage() {
           Showing <span className="font-medium text-foreground">{pageData.items.length}</span>{" "}
           of <span className="font-medium text-foreground">{pageData.total}</span>
         </div>
-        <Button type="button" size="sm" onClick={openAddDialog}>
+        <Button
+          type="button"
+          size="sm"
+          onClick={() => {
+            setEditingProduct(null)
+            setIsAddDialogOpen(true)
+          }}
+        >
           Add product
         </Button>
       </div>
@@ -80,7 +76,16 @@ export function ProductsPortalPage() {
 
       {pageData.items.length > 0 ? (
         <>
-          <ProductsTable items={pageData.items} />
+          <ProductsTable
+            items={pageData.items}
+            onEdit={(product) => {
+              setIsAddDialogOpen(false)
+              setEditingProduct(product)
+            }}
+            onDelete={(product) => {
+              setDeletingProduct(product)
+            }}
+          />
           <ProductsPagination
             page={params.page}
             limit={params.limit}
@@ -104,8 +109,24 @@ export function ProductsPortalPage() {
         />
       )}
 
-      <ProductFormDialog categories={categories} editingProduct={selectedEditing} />
-      <DeleteProductAlert deletingProduct={selectedDeleting} />
+      <ProductFormDialog
+        categories={categories}
+        editingProduct={editingProduct}
+        open={isAddDialogOpen || Boolean(editingProduct)}
+        onOpenChange={(next) => {
+          if (next) return
+          setIsAddDialogOpen(false)
+          setEditingProduct(null)
+        }}
+      />
+      <DeleteProductAlert
+        deletingProduct={deletingProduct}
+        open={Boolean(deletingProduct)}
+        onOpenChange={(next) => {
+          if (next) return
+          setDeletingProduct(null)
+        }}
+      />
     </div>
   )
 }

@@ -14,30 +14,31 @@ import {
 import type { Product } from "../domain/product.types"
 import { useDeleteProductMutation } from "@/features/products-portal/hooks/use-delete-product-mutation"
 import { productsToast } from "@/features/products-portal/lib/products.toast"
-import { useProductsUiStore } from "@/features/products-portal/store/products-ui.store"
 
 type DeleteProductAlertProps = {
   deletingProduct: Product | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function DeleteProductAlert({ deletingProduct }: DeleteProductAlertProps) {
-  const deletingProductId = useProductsUiStore((s) => s.deletingProductId)
-  const closeDeleteDialog = useProductsUiStore((s) => s.closeDeleteDialog)
+export function DeleteProductAlert({
+  deletingProduct,
+  open,
+  onOpenChange,
+}: DeleteProductAlertProps) {
   const mutation = useDeleteProductMutation()
-
-  const open = Boolean(deletingProductId)
 
   const close = () => {
     if (mutation.isPending) return
-    closeDeleteDialog()
+    onOpenChange(false)
   }
 
   const onConfirm = async () => {
-    if (!deletingProductId) return
+    if (!deletingProduct) return
     try {
-      await mutation.mutateAsync(deletingProductId)
-      productsToast.deleted(deletingProduct?.title ?? `#${deletingProductId}`)
-      closeDeleteDialog()
+      await mutation.mutateAsync(deletingProduct.id)
+      productsToast.deleted(deletingProduct.title)
+      onOpenChange(false)
     } catch (error) {
       const message = error instanceof Error ? error.message : "Delete failed"
       productsToast.error(message)

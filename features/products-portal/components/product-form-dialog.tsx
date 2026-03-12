@@ -33,11 +33,12 @@ import type { CreateProductInput, UpdateProductInput } from "../api/products.typ
 import { useCreateProductMutation } from "@/features/products-portal/hooks/use-create-product-mutation"
 import { useUpdateProductMutation } from "@/features/products-portal/hooks/use-update-product-mutation"
 import { productsToast } from "@/features/products-portal/lib/products.toast"
-import { useProductsUiStore } from "@/features/products-portal/store/products-ui.store"
 
 type ProductFormDialogProps = {
   categories: string[]
   editingProduct: Product | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 type ProductFormValues = {
@@ -53,15 +54,11 @@ type ProductFormValues = {
 export function ProductFormDialog({
   categories,
   editingProduct,
+  open,
+  onOpenChange,
 }: ProductFormDialogProps) {
   const formId = useId()
-  const isAddDialogOpen = useProductsUiStore((s) => s.isAddDialogOpen)
-  const editingProductId = useProductsUiStore((s) => s.editingProductId)
-  const closeAddDialog = useProductsUiStore((s) => s.closeAddDialog)
-  const closeEditDialog = useProductsUiStore((s) => s.closeEditDialog)
-
-  const isEdit = Boolean(editingProductId && editingProduct)
-  const open = isAddDialogOpen || Boolean(editingProductId)
+  const isEdit = Boolean(editingProduct)
 
   const createMutation = useCreateProductMutation()
   const updateMutation = useUpdateProductMutation()
@@ -97,17 +94,16 @@ export function ProductFormDialog({
   const isPending = createMutation.isPending || updateMutation.isPending
 
   const close = () => {
-    closeAddDialog()
-    closeEditDialog()
+    onOpenChange(false)
     form.reset(defaultValues)
   }
 
   const onSubmit = async (values: ProductFormValues) => {
     try {
-      if (isEdit && editingProductId) {
+      if (isEdit && editingProduct) {
         const input: UpdateProductInput = updateProductInputSchema.parse(values)
         const updated = await updateMutation.mutateAsync({
-          id: editingProductId,
+          id: editingProduct.id,
           input,
         })
         productsToast.updated(updated.title)

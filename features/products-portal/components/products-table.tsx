@@ -14,15 +14,14 @@ import {
 } from "@/components/ui/table"
 
 import type { Product } from "../domain/product.types"
-import { useProductsUiStore } from "../store/products-ui.store"
 
 type ProductsTableProps = {
   items: Product[]
+  onEdit: (product: Product) => void
+  onDelete: (product: Product) => void
 }
 
-export function ProductsTable({ items }: ProductsTableProps) {
-  const openEditDialog = useProductsUiStore((s) => s.openEditDialog)
-  const openDeleteDialog = useProductsUiStore((s) => s.openDeleteDialog)
+export function ProductsTable({ items, onEdit, onDelete }: ProductsTableProps) {
 
   return (
     <div className="rounded-lg border">
@@ -68,7 +67,7 @@ export function ProductsTable({ items }: ProductsTableProps) {
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    onClick={() => openEditDialog(p.id)}
+                    onClick={() => onEdit(p)}
                     aria-label={`Edit ${p.title}`}
                   >
                     <PencilIcon className="size-4" />
@@ -77,7 +76,7 @@ export function ProductsTable({ items }: ProductsTableProps) {
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    onClick={() => openDeleteDialog(p.id)}
+                    onClick={() => onDelete(p)}
                     aria-label={`Delete ${p.title}`}
                   >
                     <Trash2Icon className="size-4 text-destructive" />

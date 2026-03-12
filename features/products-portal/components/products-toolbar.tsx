@@ -1,52 +1,36 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo } from "react"
-import { useQueryStates } from "nuqs"
-import { debounce } from "es-toolkit/function"
+import { useMemo } from "react";
+import { useQueryStates } from "nuqs";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
-import { PRODUCTS_SORT_BY_OPTIONS, PRODUCTS_SORT_ORDER_OPTIONS } from "../lib/products.constants"
-import { productsUrlState } from "../lib/products.url-state"
-import { useProductsFilterDraft } from "../store/products-filter.store"
+import {
+  PRODUCTS_SORT_BY_OPTIONS,
+  PRODUCTS_SORT_ORDER_OPTIONS,
+} from "../lib/products.constants";
+import { productsUrlState } from "../lib/products.url-state";
 
 type ProductsToolbarProps = {
-  categories: string[]
-}
+  categories: string[];
+};
 
 export function ProductsToolbar({ categories }: ProductsToolbarProps) {
-  const [urlState, setUrlState] = useQueryStates(productsUrlState)
-  const { draftSearchText, setDraftSearchText } = useProductsFilterDraft()
+  const [urlState, setUrlState] = useQueryStates(productsUrlState);
 
   const categoryOptions = useMemo(
     () => ["all", ...categories.filter(Boolean)],
-    [categories]
-  )
-
-  useEffect(() => {
-    // Keep draft in sync when user navigates back/forward.
-    setDraftSearchText(urlState.q ?? "")
-  }, [setDraftSearchText, urlState.q])
-
-  const commitSearch = useMemo(
-    () =>
-      debounce((value: string) => {
-        setUrlState(
-          { q: value || null, page: 1 },
-          { history: "replace", shallow: true, scroll: false }
-        )
-      }, 350),
-    [setUrlState]
-  )
+    [categories],
+  );
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border bg-muted/40 p-3 text-xs sm:flex-row sm:items-end sm:justify-between">
@@ -59,19 +43,20 @@ export function ProductsToolbar({ categories }: ProductsToolbarProps) {
             type="search"
             className="text-xs"
             placeholder="Search products..."
-            value={draftSearchText}
+            value={urlState.q ?? ""}
             onChange={(event) => {
-              const value = event.target.value
-              setDraftSearchText(value)
-              commitSearch(value)
+              const value = event.target.value;
+              setUrlState(
+                { q: value || null, page: 1 },
+                { history: "replace", shallow: true, scroll: false },
+              );
             }}
             onKeyDown={(event) => {
-              if (event.key !== "Enter") return
-              commitSearch.cancel()
+              if (event.key !== "Enter") return;
               setUrlState(
-                { q: draftSearchText || null, page: 1 },
-                { history: "push", shallow: true, scroll: false }
-              )
+                { q: event.currentTarget.value || null, page: 1 },
+                { history: "push", shallow: true, scroll: false },
+              );
             }}
           />
         </div>
@@ -85,7 +70,7 @@ export function ProductsToolbar({ categories }: ProductsToolbarProps) {
             onValueChange={(value) =>
               setUrlState(
                 { category: value === "all" ? null : value, page: 1 },
-                { history: "push", shallow: true, scroll: false }
+                { history: "push", shallow: true, scroll: false },
               )
             }
           >
@@ -111,7 +96,7 @@ export function ProductsToolbar({ categories }: ProductsToolbarProps) {
             onValueChange={(value) =>
               setUrlState(
                 { sortBy: value || null, page: 1 },
-                { history: "push", shallow: true, scroll: false }
+                { history: "push", shallow: true, scroll: false },
               )
             }
           >
@@ -120,7 +105,11 @@ export function ProductsToolbar({ categories }: ProductsToolbarProps) {
             </SelectTrigger>
             <SelectContent>
               {PRODUCTS_SORT_BY_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                <SelectItem
+                  key={opt.value}
+                  value={opt.value}
+                  className="text-xs"
+                >
                   {opt.label}
                 </SelectItem>
               ))}
@@ -137,7 +126,7 @@ export function ProductsToolbar({ categories }: ProductsToolbarProps) {
             onValueChange={(value) =>
               setUrlState(
                 { sortOrder: value || null, page: 1 },
-                { history: "push", shallow: true, scroll: false }
+                { history: "push", shallow: true, scroll: false },
               )
             }
           >
@@ -146,7 +135,11 @@ export function ProductsToolbar({ categories }: ProductsToolbarProps) {
             </SelectTrigger>
             <SelectContent>
               {PRODUCTS_SORT_ORDER_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                <SelectItem
+                  key={opt.value}
+                  value={opt.value}
+                  className="text-xs"
+                >
                   {opt.label}
                 </SelectItem>
               ))}
@@ -161,8 +154,6 @@ export function ProductsToolbar({ categories }: ProductsToolbarProps) {
           variant="outline"
           size="sm"
           onClick={() => {
-            commitSearch.cancel()
-            setDraftSearchText("")
             setUrlState(
               {
                 q: null,
@@ -171,14 +162,13 @@ export function ProductsToolbar({ categories }: ProductsToolbarProps) {
                 sortOrder: null,
                 page: 1,
               },
-              { history: "push", shallow: true, scroll: false }
-            )
+              { history: "push", shallow: true, scroll: false },
+            );
           }}
         >
           Reset
         </Button>
       </div>
     </div>
-  )
+  );
 }
-

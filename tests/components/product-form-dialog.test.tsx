@@ -3,8 +3,6 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import type React from "react"
 
-import { useProductsUiStore } from "@/features/products-portal/store/products-ui.store"
-
 type GlobalWithSelectMock = typeof globalThis & {
   __onValueChange?: (value: string) => void
 }
@@ -79,22 +77,21 @@ import { ProductFormDialog } from "@/features/products-portal/components/product
 
 describe("ProductFormDialog", () => {
   beforeEach(() => {
-    useProductsUiStore.setState({
-      isAddDialogOpen: false,
-      editingProductId: null,
-      deletingProductId: null,
-      selectedProductIds: {},
-      viewMode: "table",
-    })
     mutateAsync.mockClear()
   })
 
   it("submits create form", async () => {
     const user = userEvent.setup()
 
-    useProductsUiStore.getState().openAddDialog()
-
-    render(<ProductFormDialog categories={["phones"]} editingProduct={null} />)
+    render(
+      <ProductFormDialog
+        categories={["phones"]}
+        editingProduct={null}
+        open
+        // Dialog open is fully controlled by the test in this case.
+        onOpenChange={() => {}}
+      />
+    )
 
     await user.type(screen.getByLabelText(/title/i), "My product")
     await user.click(screen.getByRole("button", { name: "phones" }))
