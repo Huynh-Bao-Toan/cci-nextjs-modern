@@ -15,7 +15,7 @@ describe("Pagination", () => {
       />,
     );
 
-    const info = screen.getByText(/Page 2 of 10/);
+    const info = screen.getByText((_, node) => node?.textContent === "Page 2 of 10");
     expect(info).toBeDefined();
 
     const prev = screen.getByRole("link", { name: "Previous" });

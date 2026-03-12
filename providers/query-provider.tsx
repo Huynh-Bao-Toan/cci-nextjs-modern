@@ -10,6 +10,7 @@ type QueryProviderProps = {
 };
 
 export function QueryProvider({ children }: QueryProviderProps) {
+  const isDev = process.env.NODE_ENV !== "production";
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -25,7 +26,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ReactQueryDevtools initialIsOpen={false} />
+      {isDev ? <ReactQueryDevtools initialIsOpen={false} /> : null}
     </QueryClientProvider>
   );
 }

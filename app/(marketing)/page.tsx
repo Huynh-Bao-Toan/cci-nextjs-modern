@@ -105,6 +105,22 @@ export default async function MarketingHomePage() {
             View favorites →
           </span>
         </Link>
+
+        <Link
+          href="/products-portal"
+          className="group rounded-xl border bg-card p-5 transition hover:border-primary/50 hover:shadow-sm"
+        >
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-primary">
+            Products Portal
+          </h3>
+          <p className="mb-3 text-sm text-muted-foreground">
+            Manage products with CRUD, filters, sorting, and URL-driven state in
+            a portal-style interface.
+          </p>
+          <span className="text-xs font-medium text-primary group-hover:underline">
+            Open portal →
+          </span>
+        </Link>
       </section>
     </main>
   );
