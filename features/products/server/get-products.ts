@@ -4,7 +4,7 @@ import { httpGetJson } from "@/lib/api/http";
 
 import type { RawProductsResponse } from "../api/products.types";
 import { mapRawProductsResponse } from "../api/products.mapper";
-import type { ProductSearchParams } from "../lib/product-query-params";
+import type { ProductSearchParams } from "../lib/product.params";
 
 export async function getProducts(params: ProductSearchParams) {
   const searchParams = new URLSearchParams();
@@ -54,4 +54,3 @@ async function getSearchedProducts(
 
   return mapRawProductsResponse(raw, params.pageSize);
 }
-

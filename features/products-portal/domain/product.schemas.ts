@@ -19,3 +19,24 @@ export const productSchema = z.object({
 
 export type ProductSchema = z.infer<typeof productSchema>
 
+function emptyStringToUndefined(value: unknown) {
+  if (typeof value !== "string") return value
+  const trimmed = value.trim()
+  return trimmed.length === 0 ? undefined : trimmed
+}
+
+export const createProductInputSchema = z.object({
+  title: z.string().trim().min(1, "Title is required"),
+  description: z.preprocess(emptyStringToUndefined, z.string().trim().optional()),
+  price: z.coerce.number().finite().nonnegative(),
+  stock: z.coerce.number().int().nonnegative(),
+  brand: z.preprocess(emptyStringToUndefined, z.string().trim().optional()),
+  category: z.string().trim().min(1, "Category is required"),
+  thumbnail: z.preprocess(
+    emptyStringToUndefined,
+    z.string().trim().url().optional()
+  ),
+})
+
+export const updateProductInputSchema = createProductInputSchema.partial()
+
