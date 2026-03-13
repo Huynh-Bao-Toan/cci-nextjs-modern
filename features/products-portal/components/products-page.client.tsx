@@ -72,7 +72,7 @@ export function ProductsPortalPage() {
         </Button>
       </div>
 
-      <ProductsToolbar categories={categories} />
+      <ProductsToolbar categories={categories} urlState={urlState} setUrlState={setUrlState} />
 
       {pageData.items.length > 0 ? (
         <>

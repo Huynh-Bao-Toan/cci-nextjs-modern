@@ -1,10 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { useQueryStates } from "nuqs";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -18,15 +16,37 @@ import {
   PRODUCTS_SORT_BY_OPTIONS,
   PRODUCTS_SORT_ORDER_OPTIONS,
 } from "../lib/products.constants";
-import { productsUrlState } from "../lib/products.url-state";
+import type { ProductsUrlState } from "../lib/products.url-state";
+
+import { ProductsSearchBox } from "./products-search-box";
+
+export type ProductsUrlStateSetter = (
+  nextState: Partial<{
+    q: string | null;
+    category: string | null;
+    sortBy: string | null;
+    sortOrder: string | null;
+    page: number;
+    limit: number;
+  }>,
+  options?: {
+    history?: "push" | "replace";
+    shallow?: boolean;
+    scroll?: boolean;
+  },
+) => void;
 
 type ProductsToolbarProps = {
   categories: string[];
+  urlState: ProductsUrlState;
+  setUrlState: ProductsUrlStateSetter;
 };
 
-export function ProductsToolbar({ categories }: ProductsToolbarProps) {
-  const [urlState, setUrlState] = useQueryStates(productsUrlState);
-
+export function ProductsToolbar({
+  categories,
+  urlState,
+  setUrlState,
+}: ProductsToolbarProps) {
   const categoryOptions = useMemo(
     () => ["all", ...categories.filter(Boolean)],
     [categories],
@@ -35,31 +55,19 @@ export function ProductsToolbar({ categories }: ProductsToolbarProps) {
   return (
     <div className="flex flex-col gap-3 rounded-lg border bg-muted/40 p-3 text-xs sm:flex-row sm:items-end sm:justify-between">
       <div className="flex flex-1 flex-wrap items-end gap-2">
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            Search
-          </Label>
-          <Input
-            type="search"
-            className="text-xs"
-            placeholder="Search products..."
-            value={urlState.q ?? ""}
-            onChange={(event) => {
-              const value = event.target.value;
-              setUrlState(
-                { q: value || null, page: 1 },
-                { history: "replace", shallow: true, scroll: false },
-              );
-            }}
-            onKeyDown={(event) => {
-              if (event.key !== "Enter") return;
-              setUrlState(
-                { q: event.currentTarget.value || null, page: 1 },
-                { history: "push", shallow: true, scroll: false },
-              );
-            }}
-          />
-        </div>
+        <ProductsSearchBox
+          value={urlState.q ?? ""}
+          mode="debounced"
+          onSearch={(term) => {
+            setUrlState(
+              {
+                q: term || null,
+                page: 1,
+              },
+              { history: "push", shallow: true, scroll: false },
+            );
+          }}
+        />
 
         <div className="flex w-full flex-1 min-w-[150px] flex-col gap-1 sm:w-auto sm:max-w-[220px]">
           <Label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
