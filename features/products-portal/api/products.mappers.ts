@@ -29,7 +29,7 @@ export function mapRawProductsResponse(
   requested: { page: number; limit: number }
 ): PaginatedProducts {
   const parsed = rawProductsResponseSchema.parse(raw)
-  const items = parsed.products.map(mapRawProduct)
+  const items = parsed.products.map((product) => mapRawProduct(product as RawProduct))
 
   return {
     items,
