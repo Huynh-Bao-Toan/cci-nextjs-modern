@@ -1,8 +1,6 @@
 import type { ProductsSearchParams } from "../domain/products.models"
 import type { ProductsSortBy, SortOrder } from "../domain/products.models"
 
-export const PRODUCTS_PAGE_SIZE_OPTIONS = [10, 12, 20, 25, 50] as const
-
 export const PRODUCTS_DEFAULT_PARAMS: ProductsSearchParams = {
   q: undefined,
   category: undefined,
