@@ -40,16 +40,11 @@ export default function FavoritesPage() {
               product={{
                 id: item.id,
                 title: item.title,
-                description: "",
                 price: item.price,
-                discountPercentage: 0,
                 rating: item.rating,
-                stock: 0,
                 brand: item.brand,
                 category: item.category,
                 thumbnailUrl: item.thumbnailUrl,
-                imageUrls: [item.thumbnailUrl],
-                tags: [],
               }}
               footerSlot={
                 <Button

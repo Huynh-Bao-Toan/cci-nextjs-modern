@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 
-import type { Product } from "@/features/products/api/products.types";
+import type { Product } from "@/features/products/domain/product.types";
 import { ProductCard } from "@/features/products/components/product-card";
 
 const product: Product = {

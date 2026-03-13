@@ -1,12 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  useQueryStates,
-  parseAsInteger,
-  parseAsString,
-} from "nuqs";
+import { useQueryStates } from "nuqs";
 import { debounce } from "es-toolkit/function";
+
+import { productsUrlState } from "../lib/product-url-state";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,11 +22,7 @@ type ProductListToolbarProps = {
 };
 
 export function ProductListToolbar({ categories }: ProductListToolbarProps) {
-  const [filters, setFilters] = useQueryStates({
-    q: parseAsString.withDefault(""),
-    category: parseAsString.withDefault(""),
-    page: parseAsInteger.withDefault(1),
-  });
+  const [filters, setFilters] = useQueryStates(productsUrlState);
 
   const [searchInput, setSearchInput] = useState(filters.q ?? "");
 

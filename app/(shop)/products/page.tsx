@@ -10,6 +10,7 @@ import { ProductGrid } from "@/features/products/components/product-grid";
 import { FavoriteToggle } from "@/features/products/components/favorite-toggle";
 import { ProductListToolbar } from "@/features/products/components/product-list-toolbar";
 import { parseProductSearchParams } from "@/features/products/lib/product-query-params";
+import { buildProductsHref } from "@/features/products/lib/product-urls";
 
 type ProductsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -79,20 +80,3 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     </main>
   );
 }
-
-function buildProductsHref(params: {
-  q?: string;
-  category?: string;
-  page: number;
-  pageSize?: number;
-}) {
-  const url = new URL("/products", "http://localhost");
-  if (params.q) url.searchParams.set("q", params.q);
-  if (params.category) url.searchParams.set("category", params.category);
-  if (params.pageSize) {
-    url.searchParams.set("pageSize", String(params.pageSize));
-  }
-  url.searchParams.set("page", String(params.page));
-  return `${url.pathname}?${url.searchParams.toString()}`;
-}
-

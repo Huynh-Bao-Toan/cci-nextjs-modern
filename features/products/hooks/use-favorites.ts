@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 
-import type { Product } from "../api/products.types";
+import type { Product } from "../domain/product.types";
 import {
   FavoriteProduct,
   useFavoritesStore,

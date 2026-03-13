@@ -1,20 +1,20 @@
 "use client"
 
-import { useQueryStates } from "nuqs"
-
 import { Button } from "@/components/ui/button"
-
-import { productsUrlState } from "../lib/products.url-state"
 
 type ProductsPaginationProps = {
   page: number
   limit: number
   total: number
+  onPageChange: (page: number) => void
 }
 
-export function ProductsPagination({ page, limit, total }: ProductsPaginationProps) {
-  const [, setUrlState] = useQueryStates(productsUrlState)
-
+export function ProductsPagination({
+  page,
+  limit,
+  total,
+  onPageChange,
+}: ProductsPaginationProps) {
   const pageCount = Math.max(1, Math.ceil(total / limit))
   if (pageCount <= 1) return null
 
@@ -32,12 +32,7 @@ export function ProductsPagination({ page, limit, total }: ProductsPaginationPro
           variant="ghost"
           size="sm"
           disabled={clamped === 1}
-          onClick={() =>
-            setUrlState(
-              { page: Math.max(1, clamped - 1) },
-              { history: "push", shallow: true, scroll: false }
-            )
-          }
+          onClick={() => onPageChange(Math.max(1, clamped - 1))}
         >
           Previous
         </Button>
@@ -46,12 +41,7 @@ export function ProductsPagination({ page, limit, total }: ProductsPaginationPro
           variant="ghost"
           size="sm"
           disabled={clamped === pageCount}
-          onClick={() =>
-            setUrlState(
-              { page: Math.min(pageCount, clamped + 1) },
-              { history: "push", shallow: true, scroll: false }
-            )
-          }
+          onClick={() => onPageChange(Math.min(pageCount, clamped + 1))}
         >
           Next
         </Button>

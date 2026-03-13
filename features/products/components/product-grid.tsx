@@ -1,6 +1,6 @@
 import { ProductCard } from "./product-card";
 
-import type { Product } from "../api/products.types";
+import type { Product } from "../domain/product.types";
 
 type ProductGridProps = {
   products: Product[];

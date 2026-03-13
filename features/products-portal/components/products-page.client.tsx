@@ -90,6 +90,12 @@ export function ProductsPortalPage() {
             page={params.page}
             limit={params.limit}
             total={pageData.total}
+            onPageChange={(nextPage) =>
+              setUrlState(
+                { page: nextPage },
+                { history: "push", shallow: true, scroll: false }
+              )
+            }
           />
         </>
       ) : (

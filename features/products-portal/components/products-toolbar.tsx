@@ -64,7 +64,7 @@ export function ProductsToolbar({
                 q: term || null,
                 page: 1,
               },
-              { history: "push", shallow: true, scroll: false },
+              { history: "replace", shallow: true, scroll: false },
             );
           }}
         />

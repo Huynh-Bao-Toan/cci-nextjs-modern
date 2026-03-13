@@ -1,9 +1,5 @@
-import type {
-  PaginatedProducts,
-  Product,
-  RawProduct,
-  RawProductsResponse,
-} from "./products.types";
+import type { RawProduct, RawProductsResponse } from "./products.types";
+import type { PaginatedProducts, Product } from "../domain/product.types";
 import { productsResponseSchema, productSchema } from "./products.schemas";
 
 export function mapRawProduct(raw: RawProduct): Product {

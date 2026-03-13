@@ -3,7 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 
-import type { Product } from "../api/products.types";
+import type { Product } from "../domain/product.types";
 
 type ProductGalleryProps = {
   product: Product;

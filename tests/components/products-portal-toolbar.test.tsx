@@ -1,22 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest"
 import { fireEvent, render, screen } from "@testing-library/react"
-import type React from "react"
 
 const setUrlState = vi.fn()
-
-type UrlState = {
-  q: string
-  category: string
-  sortBy: string
-  sortOrder: string
-  page: number
-  limit: number
-}
-
-type UrlSetterOptions = {
-  history?: "replace" | "push"
-  shallow?: boolean
-}
 
 vi.mock("@/components/ui/select", () => ({
   Select: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -25,31 +10,6 @@ vi.mock("@/components/ui/select", () => ({
   SelectTrigger: ({ children }: { children: React.ReactNode }) => <button type="button">{children}</button>,
   SelectValue: ({ placeholder }: { placeholder?: string }) => <span>{placeholder}</span>,
 }))
-
-vi.mock("nuqs", async () => {
-  const React = await vi.importActual<typeof import("react")>("react")
-  const actual = await vi.importActual<typeof import("nuqs")>("nuqs")
-  return {
-    ...actual,
-    useQueryStates: () => {
-      const [state, setState] = React.useState<UrlState>({
-        q: "",
-        category: "",
-        sortBy: "",
-        sortOrder: "",
-        page: 1,
-        limit: 12,
-      })
-
-      const setter = (patch: Partial<UrlState>, options: UrlSetterOptions) => {
-        setUrlState(patch, options)
-        setState((prev) => ({ ...prev, ...patch }))
-      }
-
-      return [state, setter]
-    },
-  }
-})
 
 import { ProductsToolbar } from "@/features/products-portal/components/products-toolbar"
 
@@ -64,7 +24,21 @@ describe("ProductsToolbar", () => {
   })
 
   it("debounces search and commits to URL state (replace)", async () => {
-    render(<ProductsToolbar categories={["phones"]} />)
+    render(
+      <ProductsToolbar
+        categories={["phones"]}
+        urlState={{
+          q: "",
+          category: "",
+          sortBy: "",
+          sortOrder: "",
+          page: 1,
+          limit: 12,
+        }}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setUrlState={setUrlState as any}
+      />,
+    )
 
     const input = screen.getByPlaceholderText(/search products/i)
     fireEvent.change(input, { target: { value: "ip" } })

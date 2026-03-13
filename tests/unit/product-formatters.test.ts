@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { Product } from "@/features/products/api/products.types";
+import type { Product } from "@/features/products/domain/product.types";
 import {
   formatProductOriginalPrice,
   formatProductPrice,

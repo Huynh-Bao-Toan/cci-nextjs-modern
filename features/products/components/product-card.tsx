@@ -6,14 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-import type { Product } from "../api/products.types";
+import type { Product } from "../domain/product.types";
 import {
-  formatProductPrice,
   formatProductOriginalPrice,
+  formatProductPrice,
 } from "../lib/product-formatters";
 
+type ProductCardData = {
+  id: Product["id"];
+  title: Product["title"];
+  price: Product["price"];
+  rating: Product["rating"];
+  thumbnailUrl: Product["thumbnailUrl"];
+  brand?: Product["brand"];
+  category?: Product["category"];
+  discountPercentage?: Product["discountPercentage"];
+  stock?: Product["stock"];
+};
+
 type ProductCardProps = {
-  product: Product;
+  product: ProductCardData;
   footerSlot?: React.ReactNode;
   className?: string;
 };
@@ -25,6 +37,7 @@ export function ProductCard({
 }: ProductCardProps) {
   const price = formatProductPrice(product);
   const originalPrice = formatProductOriginalPrice(product);
+  const discount = product.discountPercentage ?? 0;
 
   return (
     <Card
@@ -45,9 +58,9 @@ export function ProductCard({
           className="h-52 w-full object-contain transition group-hover:scale-[1.02]"
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
         />
-        {product.discountPercentage > 0 ? (
+        {discount > 0 ? (
           <Badge className="absolute left-3 top-3" variant="destructive">
-            -{product.discountPercentage.toFixed(0)}%
+            -{discount.toFixed(0)}%
           </Badge>
         ) : null}
       </Link>
@@ -70,7 +83,7 @@ export function ProductCard({
         </div>
         <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
           <span>⭐ {product.rating.toFixed(1)}</span>
-          <span>{product.stock} in stock</span>
+          <span>{(product.stock ?? 0)} in stock</span>
         </div>
         <div className="mt-2 flex items-center gap-2">
           <Button asChild size="sm" className="flex-1">

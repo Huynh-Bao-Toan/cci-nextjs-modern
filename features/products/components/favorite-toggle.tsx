@@ -4,7 +4,7 @@ import { HeartIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-import type { Product } from "../api/products.types";
+import type { Product } from "../domain/product.types";
 import { useFavorites } from "../hooks/use-favorites";
 
 type FavoriteToggleProps = {

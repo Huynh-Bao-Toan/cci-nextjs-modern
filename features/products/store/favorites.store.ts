@@ -5,7 +5,7 @@ import "client-only";
 import { create } from "zustand";
 import { devtools, persist, createJSONStorage } from "zustand/middleware";
 
-import type { Product } from "../api/products.types";
+import type { Product } from "../domain/product.types";
 
 const isDev = process.env.NODE_ENV !== "production";
 

@@ -1,12 +1,17 @@
 import { formatCurrency } from "@/lib/utils/number";
 
-import type { Product } from "../api/products.types";
+type PriceSource = {
+  price: number;
+  discountPercentage?: number | null;
+};
 
-export function formatProductPrice(product: Product): string {
+export function formatProductPrice(product: PriceSource): string {
   return formatCurrency(product.price);
 }
 
-export function formatProductOriginalPrice(product: Product): string | null {
+export function formatProductOriginalPrice(
+  product: PriceSource,
+): string | null {
   if (!product.discountPercentage) return null;
   const original = product.price / (1 - product.discountPercentage / 100);
   return formatCurrency(original);

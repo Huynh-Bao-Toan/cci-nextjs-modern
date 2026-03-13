@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-import type { Product } from "../api/products.types";
+import type { Product } from "../domain/product.types";
 import {
   formatProductOriginalPrice,
   formatProductPrice,
