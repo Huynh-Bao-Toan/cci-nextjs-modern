@@ -337,44 +337,6 @@ Sử dụng shadcn trong project:
 - Kết hợp server prefetch + hydration cho portal để giảm thời gian tải đầu trang.
 - Có route-level loading/error boundary giúp fail-safe theo segment.
 
-## 10. Technical Debt / Điểm có thể cải thiện
-
-### 10.1 Đường dẫn e2e test không khớp route thực tế
-
-- Vấn đề:
-  - tests/products-portal.spec.ts đang goto /portal/products trong khi route thực tế là /products-portal.
-- Tác động:
-  - E2E smoke có nguy cơ fail giả (false negative) hoặc không kiểm thử đúng màn hình.
-- Đề xuất cải thiện:
-  - Đồng bộ lại path e2e theo app route hiện tại và thêm helper route constants dùng chung.
-
-### 10.2 Test app/**tests**/page.test.tsx lệch với cấu trúc App Router hiện tại
-
-- Vấn đề:
-  - app/**tests**/page.test.tsx import ../page nhưng app/page.tsx không tồn tại.
-- Tác động:
-  - Test suite có thể fail hoặc không còn giá trị bảo vệ regression.
-- Đề xuất cải thiện:
-  - Chuyển test sang app/(marketing)/page.tsx hoặc bỏ test legacy này.
-
-### 10.3 Hai HTTP client song song giữa 2 feature
-
-- Vấn đề:
-  - Feature products dùng fetch wrapper (lib/api/http.ts), products-portal dùng axios client riêng.
-- Tác động:
-  - Chính sách lỗi, timeout, logging, retry không đồng nhất toàn dự án.
-- Đề xuất cải thiện:
-  - Chuẩn hóa transport layer (hoặc axios toàn cục, hoặc fetch client abstraction thống nhất).
-
-### 10.4 Cấu trúc root chưa nhất quán với cấu trúc feature
-
-- Vấn đề:
-  - Root hooks/ và stores/ gần như trống, trong khi logic thật nằm trong features/\*.
-- Tác động:
-  - Người mới vào dự án dễ nhầm vị trí đặt code.
-- Đề xuất cải thiện:
-  - Viết rõ convention trong README nội bộ hoặc dọn dẹp thư mục root không dùng.
-
 ## Tóm tắt kiến trúc dự án
 
 ### Mô hình kiến trúc
@@ -390,10 +352,3 @@ Sử dụng shadcn trong project:
 - Validation và mapping tốt, giảm rủi ro lệch dữ liệu API.
 - URL state được ưu tiên cho các tác vụ tìm kiếm/lọc/phân trang.
 - Có route boundary loading/error, tăng độ bền UI khi lỗi mạng.
-
-### Điểm cần cải thiện
-
-- Đồng bộ test với route thực tế.
-- Giảm phân mảnh HTTP/data layer giữa các feature.
-- Chuẩn hóa convention thư mục root và loại bỏ code/artifact chưa dùng.
-- Tiếp tục chuẩn hóa URL state policy giữa các feature khi mở rộng thêm module mới.
