@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   useQueryStates,
   parseAsInteger,
   parseAsString,
 } from "nuqs";
+import { debounce } from "es-toolkit/function";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,16 @@ export function ProductListToolbar({ categories }: ProductListToolbarProps) {
     page: parseAsInteger.withDefault(1),
   });
 
+  const [searchInput, setSearchInput] = useState(filters.q ?? "");
+
+  const debouncedUpdateSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setFilters({ q: value, page: 1 }, { shallow: false });
+      }, 400),
+    [setFilters],
+  );
+
   const categoryOptions = useMemo(() => ["all", ...categories], [categories]);
   const selectedCategory = filters.category ? filters.category : "all";
 
@@ -43,10 +54,12 @@ export function ProductListToolbar({ categories }: ProductListToolbarProps) {
             type="search"
             className="text-xs"
             placeholder="Search products..."
-            value={filters.q ?? ""}
-            onChange={(event) =>
-              setFilters({ q: event.target.value, page: 1 }, { shallow: false })
-            }
+            value={searchInput}
+            onChange={(event) => {
+              const value = event.target.value;
+              setSearchInput(value);
+              debouncedUpdateSearch(value);
+            }}
           />
         </div>
         <div className="flex w-full flex-1 min-w-[150px] flex-col gap-1 sm:w-auto sm:max-w-[220px]">
@@ -81,7 +94,7 @@ export function ProductListToolbar({ categories }: ProductListToolbarProps) {
           type="button"
           variant="outline"
           size="sm"
-          onClick={() =>
+          onClick={() => {
             setFilters(
               {
                 q: "",
@@ -89,8 +102,9 @@ export function ProductListToolbar({ categories }: ProductListToolbarProps) {
                 page: 1,
               },
               { shallow: false },
-            )
-          }
+            );
+            setSearchInput("");
+          }}
         >
           Reset
         </Button>
