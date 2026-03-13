@@ -4,6 +4,10 @@ import { useMemo, useState } from "react"
 import { useQueryStates } from "nuqs"
 
 import type { Product } from "../domain/product.types"
+import {
+  PRODUCTS_URL_STATE_OPTS_PAGE,
+  PRODUCTS_URL_STATE_OPTS_RESET,
+} from "../lib/products.url-state"
 import { toProductsSearchParams } from "../lib/products.url-state"
 import { productsUrlState } from "../lib/products.url-state"
 import { useCategoriesQuery } from "../hooks/use-categories-query"
@@ -23,6 +27,7 @@ export function ProductsPortalPage() {
   const [urlState, setUrlState] = useQueryStates(productsUrlState, {
     shallow: true,
     history: "replace",
+    scroll: false,
   })
 
   const params = useMemo(() => toProductsSearchParams(urlState), [urlState])
@@ -93,7 +98,7 @@ export function ProductsPortalPage() {
             onPageChange={(nextPage) =>
               setUrlState(
                 { page: nextPage },
-                { history: "push", shallow: true, scroll: false }
+                PRODUCTS_URL_STATE_OPTS_PAGE
               )
             }
           />
@@ -109,7 +114,7 @@ export function ProductsPortalPage() {
                 sortOrder: null,
                 page: 1,
               },
-              { history: "push", shallow: true, scroll: false }
+              PRODUCTS_URL_STATE_OPTS_RESET
             )
           }
         />

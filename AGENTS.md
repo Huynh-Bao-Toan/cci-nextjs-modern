@@ -1,3 +1,8 @@
+---
+description: 
+alwaysApply: false
+---
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # Next.js: ALWAYS read docs before coding

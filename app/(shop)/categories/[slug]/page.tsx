@@ -9,7 +9,7 @@ import { ProductGrid } from "@/features/products/components/product-grid";
 import { FavoriteToggle } from "@/features/products/components/favorite-toggle";
 import { getCategories } from "@/features/products/server/get-categories";
 import { getProducts } from "@/features/products/server/get-products";
-import { parseProductSearchParams } from "@/features/products/lib/product-query-params";
+import { parseProductSearchParams } from "@/features/products/lib/product.params";
 
 export default async function CategoryPage(
   props: PageProps<"/categories/[slug]">,
@@ -94,7 +94,10 @@ function buildCategoryHref(
     minRating?: number;
   },
 ) {
-  const url = new URL(`/categories/${encodeURIComponent(slug)}`, "http://localhost");
+  const url = new URL(
+    `/categories/${encodeURIComponent(slug)}`,
+    "http://localhost",
+  );
   if (params.q) url.searchParams.set("q", params.q);
   if (params.sort) url.searchParams.set("sort", params.sort);
   if (params.minRating != null) {
@@ -106,4 +109,3 @@ function buildCategoryHref(
   url.searchParams.set("page", String(params.page));
   return `${url.pathname}?${url.searchParams.toString()}`;
 }
-

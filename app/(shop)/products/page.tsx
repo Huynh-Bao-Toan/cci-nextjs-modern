@@ -9,14 +9,16 @@ import { getProducts } from "@/features/products/server/get-products";
 import { ProductGrid } from "@/features/products/components/product-grid";
 import { FavoriteToggle } from "@/features/products/components/favorite-toggle";
 import { ProductListToolbar } from "@/features/products/components/product-list-toolbar";
-import { parseProductSearchParams } from "@/features/products/lib/product-query-params";
+import { parseProductSearchParams } from "@/features/products/lib/product.params";
 import { buildProductsHref } from "@/features/products/lib/product-urls";
 
 type ProductsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+export default async function ProductsPage({
+  searchParams,
+}: ProductsPageProps) {
   const resolvedSearchParams = await searchParams;
   const parsedParams = parseProductSearchParams(resolvedSearchParams);
   const [categories, pageData] = await Promise.all([

@@ -12,3 +12,18 @@ export type ProductsUrlState = {
   page: number;
 };
 
+export const PRODUCTS_URL_STATE_OPTS_FILTER = {
+  history: "replace" as const,
+  shallow: false as const,
+};
+
+export const PRODUCTS_URL_STATE_OPTS_PAGE = {
+  history: "push" as const,
+  shallow: false as const,
+};
+
+export const PRODUCTS_URL_STATE_OPTS_RESET = {
+  history: "push" as const,
+  shallow: false as const,
+};
+

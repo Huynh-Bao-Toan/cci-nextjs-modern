@@ -28,7 +28,7 @@ import type { Product } from "../domain/product.types"
 import {
   createProductInputSchema,
   updateProductInputSchema,
-} from "../api/products.schemas"
+} from "../domain/product.schemas"
 import type { CreateProductInput, UpdateProductInput } from "../api/products.types"
 import { useCreateProductMutation } from "@/features/products-portal/hooks/use-create-product-mutation"
 import { useUpdateProductMutation } from "@/features/products-portal/hooks/use-update-product-mutation"

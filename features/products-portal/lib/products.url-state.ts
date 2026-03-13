@@ -26,6 +26,24 @@ export type ProductsUrlState = {
   limit: number
 }
 
+export const PRODUCTS_URL_STATE_OPTS_FILTER = {
+  history: "replace" as const,
+  shallow: true as const,
+  scroll: false as const,
+}
+
+export const PRODUCTS_URL_STATE_OPTS_PAGE = {
+  history: "push" as const,
+  shallow: true as const,
+  scroll: false as const,
+}
+
+export const PRODUCTS_URL_STATE_OPTS_RESET = {
+  history: "push" as const,
+  shallow: true as const,
+  scroll: false as const,
+}
+
 export function toProductsSearchParams(state: ProductsUrlState): ProductsSearchParams {
   const candidate = {
     q: state.q || undefined,

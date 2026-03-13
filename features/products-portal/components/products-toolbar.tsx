@@ -17,6 +17,11 @@ import {
   PRODUCTS_SORT_ORDER_OPTIONS,
 } from "../lib/products.constants";
 import type { ProductsUrlState } from "../lib/products.url-state";
+import {
+  PRODUCTS_URL_STATE_OPTS_FILTER,
+  PRODUCTS_URL_STATE_OPTS_PAGE,
+  PRODUCTS_URL_STATE_OPTS_RESET,
+} from "../lib/products.url-state";
 
 import { ProductsSearchBox } from "./products-search-box";
 
@@ -64,7 +69,7 @@ export function ProductsToolbar({
                 q: term || null,
                 page: 1,
               },
-              { history: "replace", shallow: true, scroll: false },
+              PRODUCTS_URL_STATE_OPTS_FILTER,
             );
           }}
         />
@@ -78,7 +83,7 @@ export function ProductsToolbar({
             onValueChange={(value) =>
               setUrlState(
                 { category: value === "all" ? null : value, page: 1 },
-                { history: "push", shallow: true, scroll: false },
+                PRODUCTS_URL_STATE_OPTS_PAGE,
               )
             }
           >
@@ -104,7 +109,7 @@ export function ProductsToolbar({
             onValueChange={(value) =>
               setUrlState(
                 { sortBy: value || null, page: 1 },
-                { history: "push", shallow: true, scroll: false },
+                PRODUCTS_URL_STATE_OPTS_PAGE,
               )
             }
           >
@@ -134,7 +139,7 @@ export function ProductsToolbar({
             onValueChange={(value) =>
               setUrlState(
                 { sortOrder: value || null, page: 1 },
-                { history: "push", shallow: true, scroll: false },
+                PRODUCTS_URL_STATE_OPTS_PAGE,
               )
             }
           >
@@ -170,7 +175,7 @@ export function ProductsToolbar({
                 sortOrder: null,
                 page: 1,
               },
-              { history: "push", shallow: true, scroll: false },
+              PRODUCTS_URL_STATE_OPTS_RESET,
             );
           }}
         >

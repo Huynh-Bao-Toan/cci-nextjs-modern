@@ -4,7 +4,11 @@ import { useMemo, useState } from "react";
 import { useQueryStates } from "nuqs";
 import { debounce } from "es-toolkit/function";
 
-import { productsUrlState } from "../lib/product-url-state";
+import {
+  PRODUCTS_URL_STATE_OPTS_FILTER,
+  PRODUCTS_URL_STATE_OPTS_RESET,
+  productsUrlState,
+} from "../lib/product-url-state";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +33,7 @@ export function ProductListToolbar({ categories }: ProductListToolbarProps) {
   const debouncedUpdateSearch = useMemo(
     () =>
       debounce((value: string) => {
-        setFilters({ q: value, page: 1 }, { shallow: false });
+        setFilters({ q: value, page: 1 }, PRODUCTS_URL_STATE_OPTS_FILTER);
       }, 400),
     [setFilters],
   );
@@ -65,7 +69,7 @@ export function ProductListToolbar({ categories }: ProductListToolbarProps) {
             onValueChange={(value) =>
               setFilters(
                 { category: value === "all" ? null : value, page: 1 },
-                { shallow: false },
+                PRODUCTS_URL_STATE_OPTS_FILTER,
               )
             }
           >
@@ -95,7 +99,7 @@ export function ProductListToolbar({ categories }: ProductListToolbarProps) {
                 category: null,
                 page: 1,
               },
-              { shallow: false },
+              PRODUCTS_URL_STATE_OPTS_RESET,
             );
             setSearchInput("");
           }}

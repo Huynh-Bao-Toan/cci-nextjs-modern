@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseProductSearchParams,
   productSearchParamsSchema,
-} from "@/features/products/lib/product-query-params";
+} from "@/features/products/lib/product.params";
 
 describe("product search params", () => {
   it("applies defaults when params are missing", () => {
@@ -33,4 +33,3 @@ describe("product search params", () => {
     expect(parsed.q).toBe("phone");
   });
 });
-
