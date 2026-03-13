@@ -1,18 +1,30 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+test("can browse products, open detail, and manage favorites", async ({
+  page,
+}) => {
+  const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
-});
+  await page.goto(baseURL);
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+  await page.getByRole("link", { name: /start browsing products/i }).click();
+  await expect(page).toHaveURL(/\/products/);
 
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
+  const firstCard = page.getByRole("link", { name: /view/i }).first();
+  await firstCard.click();
 
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2 }),
+  ).toBeVisible();
+
+  const favoriteButton = page.getByRole("button", {
+    name: /add to favorites|remove from favorites/i,
+  });
+  await favoriteButton.click();
+
+  await page.getByRole("link", { name: /favorites/i }).click();
+  await expect(page).toHaveURL(/\/favorites/);
+  await expect(
+    page.getByText(/products you have marked as favorites/i),
+  ).toBeVisible();
 });
