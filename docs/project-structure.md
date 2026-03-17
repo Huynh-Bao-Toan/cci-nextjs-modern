@@ -8,7 +8,7 @@ Ghi chú chuẩn hóa tài liệu:
 Project được tổ chức theo **feature-first architecture**, kết hợp rõ ràng giữa:
 
 - **App Router layer (`app/`)**: định nghĩa route, layout, boundary (loading/error), quyết định server vs client.
-- **Feature layer (`features/*`)**: mỗi domain nghiệp vụ (ví dụ `products`, `products-portal`) tự quản lý **domain model, API layer, URL state, hooks, UI components**.
+- **Feature layer (`features/*`)**: mỗi domain nghiệp vụ (ví dụ `products`, `products-portal`) tự quản lý **domain model, API layer, và toàn bộ Presentation layer (components/hooks/lib) gom trong `presentation/`**.
 - **Shared UI & shell (`components/*`)**: design system (`components/ui`) và layout/thành phần chia sẻ (`components/shared`).
 - **Infrastructure & cross-cutting (`lib/`, `providers/`, `styles/`)**: HTTP clients, util, global providers, theming, tailwind/shadcn.
 - **Testing layer (`tests/`)**: kiểm thử unit + component + e2e gắn chặt với feature và component cụ thể.
@@ -24,8 +24,8 @@ Triết lý chính:
   - **Domain model** (`domain/*.types.ts`, `domain/*.models.ts`)
   - UI chỉ làm việc với **domain model**, không chạm trực tiếp vào raw API response.
 - **URL là nguồn sự thật cho state tìm kiếm/lọc/phân trang**:
-  - Feature shop: `features/products/lib/product.params.ts`, `product-url-state.ts`.
-  - Portal: `features/products-portal/lib/products.params.ts`, `products.url-state.ts`.
+  - Feature shop: `features/products/presentation/lib/product.params.ts`, `product-url-state.ts`.
+  - Portal: `features/products-portal/presentation/lib/products.params.ts`, `products.url-state.ts`.
 
 Nhờ cách tổ chức này, developer mới có thể nhìn route trong `app/`, lần theo sang `features/*`, và nhanh chóng nắm được data flow, nơi đặt logic, nơi đặt UI.
 
@@ -50,8 +50,8 @@ Nhờ cách tổ chức này, developer mới có thể nhìn route trong `app/`
 - `app/(shop)/layout.tsx`: bọc các route shop trong `PageShell`.
 - `app/(shop)/products/page.tsx`: server component cho listing products, dùng:
   - `searchProducts`, `getCategories` (composition layer trong `features/products/composition`),
-  - `parseProductSearchParams`, `buildProductsHref` (URL/state helper trong `features/products/lib`),
-  - `ProductGrid`, `FavoriteToggle`, `ProductListToolbar` (UI feature).
+  - `parseProductSearchParams`, `buildProductsHref` (URL/state helper trong `features/products/presentation/lib`),
+  - `ProductGrid`, `FavoriteToggle`, `ProductListToolbar` (UI feature trong `features/products/presentation/components`).
 - `app/(portal)/products-portal/page.tsx`: route portal dùng React Query + URL state + hydration:
   - `parseProductsSearchParams`, `getDefaultProductsSearchParams` (params),
   - `productsQueries` (React Query helper),
@@ -72,10 +72,11 @@ Nhờ cách tổ chức này, developer mới có thể nhìn route trong `app/`
 - Mỗi feature là một **bounded context** độc lập, gồm:
   - `domain/` – types/models/schemas gắn với domain.
   - `api/` – raw API types, schemas, endpoints, mappers.
-  - `lib/` – helper, URL/params, keys/queries, constants,...
-  - `hooks/` – custom hooks của feature.
-  - `components/` – UI gắn liền với nghiệp vụ feature.
-  - `application/`, `adapters/`, `composition/` – clean architecture layers cho shop.
+  - `application/`, `adapters/`, `composition/` – clean architecture layers (use-cases, ports, repository wiring).
+  - `presentation/` – **toàn bộ Presentation layer**, gom:
+    - `presentation/components/` – UI gắn liền với nghiệp vụ feature.
+    - `presentation/hooks/` – custom hooks của feature.
+    - `presentation/lib/` – helper, URL/params, keys/queries, constants,...
   - `store/` – state management cục bộ của feature (VD favorites).
 
 **Ví dụ feature hiện có**
@@ -129,7 +130,7 @@ Nhờ cách tổ chức này, developer mới có thể nhìn route trong `app/`
 
 **Không nên đặt**
 
-- Không đặt code **đặc thù một feature** (VD parse search params sản phẩm) – hãy để trong `features/products/lib` hoặc `features/products-portal/lib`.
+- Không đặt code **đặc thù một feature** (VD parse search params sản phẩm) – hãy để trong `features/products/presentation/lib` hoặc `features/products-portal/presentation/lib`.
 
 ---
 
@@ -165,7 +166,7 @@ Nhờ cách tổ chức này, developer mới có thể nhìn route trong `app/`
 
 - Khi một hook bắt đầu được share giữa nhiều feature, nên cân nhắc:
   - Nếu hook về UI (VD scroll, resize) → đặt ở `hooks/`.
-  - Nếu hook gắn domain cụ thể → để trong `features/<feature>/hooks/`.
+  - Nếu hook gắn domain cụ thể → để trong `features/<feature>/presentation/hooks/`.
 
 ---
 
@@ -252,23 +253,24 @@ features/products/
     products-http.repository.ts
   composition/
     products.container.ts
-  lib/
-    product.params.ts
-    product-url-state.ts
-    product-urls.ts
-    product-formatters.ts
-  hooks/
-    use-favorites.ts
+  presentation/
+    lib/
+      product.params.ts
+      product-url-state.ts
+      product-urls.ts
+      product-formatters.ts
+    hooks/
+      use-favorites.ts
+    components/
+      product-grid.tsx
+      product-card.tsx
+      product-gallery.tsx
+      product-price.tsx
+      product-skeleton.tsx
+      product-list-toolbar.tsx
+      favorite-toggle.tsx
   store/
     favorites.store.ts
-  components/
-    product-grid.tsx
-    product-card.tsx
-    product-gallery.tsx
-    product-price.tsx
-    product-skeleton.tsx
-    product-list-toolbar.tsx
-    favorite-toggle.tsx
 ```
 
 ### `domain/` – domain model
@@ -307,9 +309,9 @@ features/products/
 - `composition/products.container.ts`:
   - Wiring concrete repository vào use-cases, export facade cho app routes dùng trực tiếp.
 
-### `lib/` – helper & URL state (feature-level)
+### `presentation/lib/` – helper & URL state (feature-level)
 
-- **Shop (`features/products/lib`)**
+- **Shop (`features/products/presentation/lib`)**
   - `product.params.ts`:
     - Dùng `zod` để parse/validate `searchParams` từ URL.
   - `product-url-state.ts`:
@@ -319,7 +321,7 @@ features/products/
   - `product-formatters.ts`:
     - Định nghĩa cách format giá, label,... cho product.
 
-- **Portal (`features/products-portal/lib`)**
+- **Portal (`features/products-portal/presentation/lib`)**
   - `products.params.ts`:
     - `parseProductsSearchParams`, `normalizeProductsSearchParams`, `getDefaultProductsSearchParams`.
     - Dùng `zod` và `es-toolkit` để flatten, chuẩn hóa, loại bỏ giá trị rỗng (`omitBy` + `isNil`).
@@ -335,9 +337,9 @@ features/products/
   - `products.toast.ts`:
     - Helper hiển thị toast cho các action portal.
 
-### `hooks/` – custom hooks gắn với feature
+### `presentation/hooks/` – custom hooks gắn với feature
 
-- Ví dụ `features/products/hooks/use-favorites.ts`:
+- Ví dụ `features/products/presentation/hooks/use-favorites.ts`:
   - Bọc quanh `useFavoritesStore` (Zustand).
   - Đưa ra API thân thiện cho UI:
     - `items`, `isFavorite`, `toggleFavorite(product)`, `removeFavorite`, `clear`.
@@ -354,7 +356,7 @@ features/products/
     - Tách state local (favorites) khỏi React Query, không phụ thuộc backend.
     - Persist vào `localStorage` với key ổn định.
 
-### `components/` – UI gắn domain
+### `presentation/components/` – UI gắn domain
 
 - Các component ở đây **nhận domain types** làm props:
   - `ProductGrid`, `ProductCard`, `ProductGallery`, `ProductPrice`, `ProductListToolbar`, `FavoriteToggle`, `ProductSkeleton`.
@@ -399,34 +401,34 @@ Các hậu tố file thể hiện rõ **vai trò kiến trúc**:
 
 - **`.params.ts`**
   - Parse/normalize **query params** từ URL thành cấu trúc typed:
-    - `features/products-portal/lib/products.params.ts`.
-    - `features/products/lib/product.params.ts`.
+    - `features/products-portal/presentation/lib/products.params.ts`.
+    - `features/products/presentation/lib/product.params.ts`.
 
 - **`.url-state.ts`**
   - Định nghĩa **shape state đồng bộ với URL** bằng `nuqs`:
-    - `features/products/lib/product-url-state.ts`.
-    - `features/products-portal/lib/products.url-state.ts`.
+    - `features/products/presentation/lib/product-url-state.ts`.
+    - `features/products-portal/presentation/lib/products.url-state.ts`.
 
 ### 4.3. Query & key
 
 - **`.queries.ts`**
   - Định nghĩa React Query queries, queryFn, staleTime:
-    - `features/products-portal/lib/products.queries.ts`.
+    - `features/products-portal/presentation/lib/products.queries.ts`.
 
 - **`.keys.ts`**
   - Chứa factory tạo query keys:
-    - `features/products-portal/lib/products.keys.ts`.
+    - `features/products-portal/presentation/lib/products.keys.ts`.
 
 ### 4.4. UI & hooks
 
 - **`.client.tsx`**
   - Component rõ ràng là **client component** cho feature:
-    - `features/products-portal/components/products-page.client.tsx`.
+    - `features/products-portal/presentation/components/products-page.client.tsx`.
 
 - **`use-*.ts`**
   - Custom hooks:
-    - `features/products/hooks/use-favorites.ts`.
-    - `features/products-portal/hooks/use-products-query.ts`, `use-categories-query.ts`, `use-create-product-mutation.ts`, `use-update-product-mutation.ts`.
+    - `features/products/presentation/hooks/use-favorites.ts`.
+    - `features/products-portal/presentation/hooks/use-products-query.ts`, `use-categories-query.ts`, `use-create-product-mutation.ts`, `use-update-product-mutation.ts`.
 
 - **`*.store.ts`**
   - State store với Zustand:
@@ -461,11 +463,11 @@ Lợi ích:
 
 ### 5.1. Phân lớp component
 
-| Loại component         | Vị trí                    | Mục đích                                                |
-| ---------------------- | ------------------------- | ------------------------------------------------------- |
-| **UI primitives**      | `components/ui/*`         | Design system + building blocks (button, input, dialog) |
-| **Shared layout**      | `components/shared/*`     | Page shell, header/footer, pagination, empty/error      |
-| **Feature components** | `features/*/components/*` | UI gắn domain: product grid, toolbar, portal table      |
+| Loại component         | Vị trí                                 | Mục đích                                                |
+| ---------------------- | -------------------------------------- | ------------------------------------------------------- |
+| **UI primitives**      | `components/ui/*`                      | Design system + building blocks (button, input, dialog) |
+| **Shared layout**      | `components/shared/*`                  | Page shell, header/footer, pagination, empty/error      |
+| **Feature components** | `features/*/presentation/components/*` | UI gắn domain: product grid, toolbar, portal table      |
 
 **UI primitives (`components/ui`)**
 
@@ -482,11 +484,11 @@ Lợi ích:
 - `app-header.tsx`, `app-footer.tsx`: khung site.
 - `section-heading.tsx`, `empty-state.tsx`, `error-state.tsx`, `loading-skeleton.tsx`, `pagination.tsx`, `breadcrumb.tsx`, `mode-toggle.tsx`.
 
-**Feature components (`features/*/components`)**
+**Feature components (`features/*/presentation/components`)**
 
-- **Shop (`features/products/components`)**:
+- **Shop (`features/products/presentation/components`)**:
   - `product-grid.tsx`, `product-card.tsx`, `product-gallery.tsx`, `product-price.tsx`, `product-list-toolbar.tsx`, `favorite-toggle.tsx`, `product-skeleton.tsx`.
-- **Portal (`features/products-portal/components`)**:
+- **Portal (`features/products-portal/presentation/components`)**:
   - `products-page.client.tsx` (container chính).
   - `products-toolbar.tsx`, `products-table.tsx`, `products-pagination.tsx`, `products-search-box.tsx`, `products-empty.tsx`, `products-error.tsx`.
   - `product-form-dialog.tsx`, `delete-product-alert.tsx`.
@@ -495,7 +497,7 @@ Nguyên tắc:
 
 - `components/ui` không biết gì về domain.
 - `components/shared` chỉ nhận props generic.
-- `features/*/components` nhận **domain types** (VD `Product`) và gọi hooks/URL state/portal logic.
+- `features/*/presentation/components` nhận **domain types** (VD `Product`) và gọi hooks/URL state/portal logic.
 
 ---
 

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseProductSearchParams,
   productSearchParamsSchema,
-} from "@/features/products/lib/product.params";
+} from "@/features/products/presentation/lib/product.params";
 
 describe("product search params", () => {
   it("applies defaults when params are missing", () => {

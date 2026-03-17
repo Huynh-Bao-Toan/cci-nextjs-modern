@@ -3,14 +3,14 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { SectionHeading } from "@/components/shared/section-heading";
 
-import { ProductGallery } from "@/features/products/components/product-gallery";
-import { ProductPrice } from "@/features/products/components/product-price";
-import { ProductGrid } from "@/features/products/components/product-grid";
-import { FavoriteToggle } from "@/features/products/components/favorite-toggle";
+import { ProductGallery } from "@/features/products/presentation/components/product-gallery";
+import { ProductPrice } from "@/features/products/presentation/components/product-price";
+import { ProductGrid } from "@/features/products/presentation/components/product-grid";
+import { FavoriteToggle } from "@/features/products/presentation/components/favorite-toggle";
 import {
   getProductDetail,
   getRelatedProducts,
-} from "@/features/products/composition/products.container";
+} from "@/features/products/adapters/products.container";
 
 type ProductDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -109,7 +109,7 @@ async function RelatedProducts({ relatedPromise }: RelatedProps) {
 }
 
 import { Suspense } from "react";
-import { ProductSkeleton } from "@/features/products/components/product-skeleton";
+import { ProductSkeleton } from "@/features/products/presentation/components/product-skeleton";
 
 function SuspenseRelated({ relatedPromise }: RelatedProps) {
   return (
@@ -126,4 +126,3 @@ function SuspenseRelated({ relatedPromise }: RelatedProps) {
     </Suspense>
   );
 }
-

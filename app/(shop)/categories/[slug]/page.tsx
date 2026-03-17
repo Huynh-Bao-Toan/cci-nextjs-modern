@@ -5,13 +5,13 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Pagination } from "@/components/shared/pagination";
 import { SectionHeading } from "@/components/shared/section-heading";
 
-import { ProductGrid } from "@/features/products/components/product-grid";
-import { FavoriteToggle } from "@/features/products/components/favorite-toggle";
+import { ProductGrid } from "@/features/products/presentation/components/product-grid";
+import { FavoriteToggle } from "@/features/products/presentation/components/favorite-toggle";
 import {
   getCategories,
   searchProducts,
-} from "@/features/products/composition/products.container";
-import { parseProductSearchParams } from "@/features/products/lib/product.params";
+} from "@/features/products/adapters/products.container";
+import { parseProductSearchParams } from "@/features/products/presentation/lib/product.params";
 
 export default async function CategoryPage(
   props: PageProps<"/categories/[slug]">,

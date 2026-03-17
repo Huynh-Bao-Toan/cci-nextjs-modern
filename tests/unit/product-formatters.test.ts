@@ -4,7 +4,7 @@ import type { Product } from "@/features/products/domain/product.types";
 import {
   formatProductOriginalPrice,
   formatProductPrice,
-} from "@/features/products/lib/product-formatters";
+} from "@/features/products/presentation/lib/product-formatters";
 
 const baseProduct: Product = {
   id: 1,
@@ -40,4 +40,3 @@ describe("product formatters", () => {
     expect(formatted).toBeNull();
   });
 });
-

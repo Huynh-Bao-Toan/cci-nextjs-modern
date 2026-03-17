@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 
 import type { Product } from "@/features/products/domain/product.types";
-import { ProductCard } from "@/features/products/components/product-card";
+import { ProductCard } from "@/features/products/presentation/components/product-card";
 
 const product: Product = {
   id: 1,
@@ -37,4 +37,3 @@ describe("ProductCard", () => {
     expect(link).toBeDefined();
   });
 });
-

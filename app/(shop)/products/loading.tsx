@@ -1,6 +1,6 @@
 import { SectionHeading } from "@/components/shared/section-heading";
 import { LoadingSkeleton } from "@/components/shared/loading-skeleton";
-import { ProductSkeleton } from "@/features/products/components/product-skeleton";
+import { ProductSkeleton } from "@/features/products/presentation/components/product-skeleton";
 
 export default function ProductsLoading() {
   return (
@@ -21,4 +21,3 @@ export default function ProductsLoading() {
     </main>
   );
 }
-

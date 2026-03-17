@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { getCategories } from "@/features/products/composition/products.container";
+import { getCategories } from "@/features/products/adapters/products.container";
 
 export default async function MarketingHomePage() {
   const categories = (await getCategories()).filter(Boolean);
@@ -125,4 +125,3 @@ export default async function MarketingHomePage() {
     </main>
   );
 }
-

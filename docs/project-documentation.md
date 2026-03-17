@@ -15,7 +15,7 @@ Dự án là một mini commerce catalog xây trên Next.js App Router, gồm 2 
 Mục tiêu thực tế thể hiện trong code:
 
 - Trình diễn pattern render server-first cho catalog ở app/(shop)/products/page.tsx và app/(shop)/products/[id]/page.tsx.
-- Trình diễn pattern client-driven với URL state + server state hydration ở app/(portal)/products-portal/page.tsx và features/products-portal/components/products-page.client.tsx.
+- Trình diễn pattern client-driven với URL state + server state hydration ở app/(portal)/products-portal/page.tsx và features/products-portal/presentation/components/products-page.client.tsx.
 - Trình diễn tách lớp API model -> mapper -> domain model ở cả 2 feature products và products-portal.
 
 Đối tượng sử dụng:
@@ -93,9 +93,9 @@ Cây thư mục rút gọn theo hiện trạng:
       not-found.tsx
     features/
       products/
-        api/ domain/ application/ adapters/ composition/ lib/ hooks/ store/ components/
+        api/ domain/ application/ adapters/ composition/ presentation/ store/
       products-portal/
-        api/ domain/ lib/ hooks/ components/
+        api/ domain/ application/ adapters/ composition/ presentation/
     components/
       ui/
       shared/
@@ -115,7 +115,7 @@ Cây thư mục rút gọn theo hiện trạng:
 Vai trò chính:
 
 - app: routing và composition của route/layout theo App Router.
-- features: tổ chức theo feature module, mỗi feature có API/domain/lib/hooks/components riêng.
+- features: tổ chức theo feature module, mỗi feature có api/domain/application/adapters/composition và presentation (gom components/hooks/lib) riêng.
 - components/ui: primitive component tái sử dụng toàn app.
 - components/shared: shell/header/footer/pagination/empty/error dùng chung.
 - lib: helper cross-feature (API wrapper, utility).
@@ -178,7 +178,7 @@ Server Component (mặc định, không có use client):
 Client Component:
 
 - app/(shop)/favorites/page.tsx (use favorites store).
-- features/products-portal/components/products-page.client.tsx.
+- features/products-portal/presentation/components/products-page.client.tsx.
 - toolbar/dialog/table/mutation hooks ở products-portal.
 - product-list-toolbar ở feature products cũng là client component.
 
@@ -207,7 +207,7 @@ Flow chính:
 
 Chi tiết:
 
-- parseProductSearchParams trong features/products/lib/product.params.ts flatten string|string[] -> string rồi parse.
+- parseProductSearchParams trong features/products/presentation/lib/product.params.ts flatten string|string[] -> string rồi parse.
 - search-products.use-case normalize params, repository chọn endpoint: /products/search, /products/category/:slug, /products.
 - Cache strategy:
   - search dùng no-store.
@@ -250,8 +250,8 @@ Dùng useState cho state UI cục bộ, ví dụ:
 - Feature products: ProductListToolbar dùng useQueryStates(productsUrlState), shallow false để điều hướng đồng bộ URL.
 - Feature products-portal: ProductsPortalPage dùng useQueryStates(productsUrlState) với history replace/push tùy hành động.
 - Cả hai feature đã tách bộ option URL state thành hằng số dùng chung (PRODUCTS_URL_STATE_OPTS_FILTER/PAGE/RESET) trong:
-  - features/products/lib/product-url-state.ts
-  - features/products-portal/lib/products.url-state.ts
+  - features/products/presentation/lib/product-url-state.ts
+  - features/products-portal/presentation/lib/products.url-state.ts
 
 ### Server state
 
@@ -280,7 +280,7 @@ Mô hình tổ chức component:
 
 - components/ui: primitive có thể dùng ở mọi nơi (Button, Input, Select, Table, Dialog...).
 - components/shared: component nghiệp vụ dùng chung (PageShell, Pagination, EmptyState, ErrorState).
-- features/\*/components: component đặc thù từng feature.
+- features/\*/presentation/components: component đặc thù từng feature.
 
 Pattern tái sử dụng thực tế:
 
