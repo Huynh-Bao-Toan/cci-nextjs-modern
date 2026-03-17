@@ -6,8 +6,8 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
 
-import { ProductCard } from "@/features/products/components/product-card";
-import { useFavorites } from "@/features/products/hooks/use-favorites";
+import { ProductCard } from "@/features/products/presentation/components/product-card";
+import { useFavorites } from "@/features/products/presentation/hooks/use-favorites";
 
 export default function FavoritesPage() {
   const { items, removeFavorite, clear } = useFavorites();
@@ -22,11 +22,7 @@ export default function FavoritesPage() {
           subtitle="Products you have marked as favorites on this device."
         />
         {hasFavorites ? (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => clear()}
-          >
+          <Button variant="outline" size="sm" onClick={() => clear()}>
             Clear all
           </Button>
         ) : null}
@@ -80,4 +76,3 @@ export default function FavoritesPage() {
     </main>
   );
 }
-

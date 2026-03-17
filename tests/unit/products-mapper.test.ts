@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import type { RawProduct, RawProductsResponse } from "@/features/products/api/products.types";
+import type {
+  RawProduct,
+  RawProductsResponse,
+} from "@/features/products/api/products.types";
 import {
   mapRawProduct,
   mapRawProductsResponse,
@@ -47,4 +50,3 @@ describe("products mapper", () => {
     expect(paginated.pageSize).toBe(12);
   });
 });
-

@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it } from "vitest";
 
-import { mapRawProduct } from "@/features/products-portal/api/products.mappers"
+import { mapRawProduct } from "@/features/products-portal/api/products.mappers";
 
 describe("products-portal mappers", () => {
   it("maps raw product to domain product", () => {
@@ -17,7 +17,7 @@ describe("products-portal mappers", () => {
       thumbnail: "https://example.com/a.png",
       images: ["https://example.com/b.png"],
       tags: ["x"],
-    })
+    });
 
     expect(mapped).toEqual({
       id: 1,
@@ -32,8 +32,8 @@ describe("products-portal mappers", () => {
       thumbnailUrl: "https://example.com/a.png",
       imageUrls: ["https://example.com/b.png"],
       tags: ["x"],
-    })
-  })
+    });
+  });
 
   it("fills optional raw fields with defaults", () => {
     const mapped = mapRawProduct({
@@ -43,14 +43,13 @@ describe("products-portal mappers", () => {
       price: 0,
       category: "misc",
       thumbnail: "https://example.com/a.png",
-    })
+    });
 
-    expect(mapped.brand).toBe("")
-    expect(mapped.discountPercentage).toBe(0)
-    expect(mapped.rating).toBe(0)
-    expect(mapped.stock).toBe(0)
-    expect(mapped.imageUrls).toEqual([])
-    expect(mapped.tags).toEqual([])
-  })
-})
-
+    expect(mapped.brand).toBe("");
+    expect(mapped.discountPercentage).toBe(0);
+    expect(mapped.rating).toBe(0);
+    expect(mapped.stock).toBe(0);
+    expect(mapped.imageUrls).toEqual([]);
+    expect(mapped.tags).toEqual([]);
+  });
+});

@@ -1,5 +1,5 @@
 import { SectionHeading } from "@/components/shared/section-heading";
-import { ProductSkeleton } from "@/features/products/components/product-skeleton";
+import { ProductSkeleton } from "@/features/products/presentation/components/product-skeleton";
 
 export default function CategoryLoading() {
   return (
@@ -13,4 +13,3 @@ export default function CategoryLoading() {
     </main>
   );
 }
-

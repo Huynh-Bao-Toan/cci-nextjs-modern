@@ -26,9 +26,9 @@ Next.js App Router (app/*)
           |
           v
 Presentation Layer
-  - features/*/components
-  - features/*/hooks
-  - features/*/lib (URL state, query keys, params)
+  - features/*/presentation/components
+  - features/*/presentation/hooks
+  - features/*/presentation/lib (URL state, query keys, params)
   - components/shared, components/ui
           |
           v
@@ -72,7 +72,7 @@ Nguyên tắc lõi:
 - Application: `features/products/application/*`.
 - Adapter: `features/products/adapters/products-http.repository.ts`.
 - Composition: `features/products/composition/products.container.ts`.
-- Presentation: `features/products/components/*`, `features/products/hooks/*`, `features/products/lib/*`.
+- Presentation: `features/products/presentation/components/*`, `features/products/presentation/hooks/*`, `features/products/presentation/lib/*`.
 
 Use-cases chính:
 
@@ -92,7 +92,7 @@ Use-cases chính:
 - Application: `features/products-portal/application/*`.
 - Adapter: `features/products-portal/adapters/products-http.repository.ts`.
 - Composition: `features/products-portal/composition/products.container.ts`.
-- Presentation: `features/products-portal/components/*`, `features/products-portal/hooks/*`, `features/products-portal/lib/*`.
+- Presentation: `features/products-portal/presentation/components/*`, `features/products-portal/presentation/hooks/*`, `features/products-portal/presentation/lib/*`.
 
 Use-cases chính:
 
@@ -122,7 +122,7 @@ Use-cases chính:
 ### 5.1 Luồng đọc danh sách ở shop (`/products`)
 
 1. Route server đọc `searchParams`.
-2. Parse/normalize bằng `features/products/lib/product.params.ts`.
+2. Parse/normalize bằng `features/products/presentation/lib/product.params.ts`.
 3. Gọi `searchProducts` từ `features/products/composition/products.container.ts`.
 4. Use-case gọi `ProductsRepository` port.
 5. `ProductsHttpRepository` gọi API endpoint tương ứng.
@@ -131,8 +131,8 @@ Use-cases chính:
 
 ### 5.2 Luồng đọc danh sách ở portal (`/products-portal`)
 
-1. URL state đọc/ghi qua `features/products-portal/lib/products.url-state.ts`.
-2. Params chuyển thành `ProductsSearchParams` qua `products.params.ts`.
+1. URL state đọc/ghi qua `features/products-portal/presentation/lib/products.url-state.ts`.
+2. Params chuyển thành `ProductsSearchParams` qua `presentation/lib/products.params.ts`.
 3. Hook query gọi `productsQueries.list(params)`.
 4. `productsQueries` gọi `searchProducts` từ composition container.
 5. Use-case -> repository -> endpoint -> mapper.
@@ -156,6 +156,7 @@ Checklist tổng hợp:
 - Composition root đứng ngoài Application để wiring dependency: Đạt.
 - Mapping raw API -> domain ở boundary: Đạt.
 - Presentation không phụ thuộc endpoint cụ thể: Đạt.
+- Presentation layer được đặt tên tường minh qua thư mục `presentation/`, gom đủ components/hooks/lib: Đạt.
 
 Kết luận:
 
@@ -163,7 +164,7 @@ Kết luận:
 
 ## 7. Điểm có thể cải thiện thêm ở cấp toàn dự án
 
-- Có thể chuẩn hóa naming/query layer giữa hai feature để giảm duplication trong `lib/*.params.ts`, `lib/*.url-state.ts`.
+- Có thể chuẩn hóa naming/query layer giữa hai feature để giảm duplication trong `presentation/lib/*.params.ts`, `presentation/lib/*.url-state.ts`.
 - Composition hiện dùng singleton repository ở module scope; nếu cần đa môi trường runtime/test nâng cao có thể chuyển sang factory container.
 - Nên thêm contract test cho từng `ProductsRepository` implementation để khóa chặt hành vi domain-level.
 - Có thể bổ sung architecture decision record (ADR) trong `docs/` để theo dõi quyết định lớn khi mở rộng thêm feature mới.
@@ -178,7 +179,7 @@ Khi thêm feature mới (ví dụ `orders`), áp dụng theo thứ tự:
 4. Implement adapter trong `adapters/`.
 5. Tạo endpoint/raw schema/mapper trong `api/`.
 6. Wiring tại `composition/*.container.ts`.
-7. Dùng từ `components/`, `hooks/`, `lib/` (URL state/query keys).
+7. Tạo `presentation/` gom `components/`, `hooks/`, `lib/` (URL state/query keys).
 8. Thêm test unit cho use-case + mapper, test component/hook cho luồng chính.
 
 Làm đúng thứ tự này sẽ giữ Dependency Rule ổn định và tránh rò rỉ infrastructure vào domain/application.

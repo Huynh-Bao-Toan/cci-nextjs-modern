@@ -1,7 +1,7 @@
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { LoadingSkeleton } from "@/components/shared/loading-skeleton";
-import { ProductSkeleton } from "@/features/products/components/product-skeleton";
+import { ProductSkeleton } from "@/features/products/presentation/components/product-skeleton";
 
 export default function ProductDetailLoading() {
   return (
@@ -35,4 +35,3 @@ export default function ProductDetailLoading() {
     </main>
   );
 }
-

@@ -4,15 +4,15 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Pagination } from "@/components/shared/pagination";
 import { SectionHeading } from "@/components/shared/section-heading";
 
-import { ProductGrid } from "@/features/products/components/product-grid";
-import { FavoriteToggle } from "@/features/products/components/favorite-toggle";
-import { ProductListToolbar } from "@/features/products/components/product-list-toolbar";
+import { ProductGrid } from "@/features/products/presentation/components/product-grid";
+import { FavoriteToggle } from "@/features/products/presentation/components/favorite-toggle";
+import { ProductListToolbar } from "@/features/products/presentation/components/product-list-toolbar";
 import {
   getCategories,
   searchProducts,
-} from "@/features/products/composition/products.container";
-import { parseProductSearchParams } from "@/features/products/lib/product.params";
-import { buildProductsHref } from "@/features/products/lib/product-urls";
+} from "@/features/products/adapters/products.container";
+import { parseProductSearchParams } from "@/features/products/presentation/lib/product.params";
+import { buildProductsHref } from "@/features/products/presentation/lib/product-urls";
 
 type ProductsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
