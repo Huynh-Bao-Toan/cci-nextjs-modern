@@ -1,0 +1,134 @@
+---
+description: "Evaluate which features need strict clean architecture vs pragmatic structure (repo-specific: features/products & features/products-portal)."
+globs:
+  - "features/**"
+---
+
+## Mục tiêu
+
+Khi sửa/thiết kế một feature trong `features/**`, hãy **đánh giá mức kiến trúc cần thiết** (pragmatic / clean vừa / strict clean architecture) dựa trên:
+
+- Checklist 10 tiêu chí (0/1/2 điểm) bên dưới
+- Tín hiệu từ **logic & cấu trúc hiện tại của repo**
+
+Kết quả phải trả về:
+
+- **Tổng điểm (0–20)**
+- **Mức kiến trúc khuyến nghị**: pragmatic / clean vừa / strict hơn
+- **2–4 bullet “lý do điểm cao”** (nêu đúng chỗ đang phình logic hoặc rủi ro)
+- **2–4 hành động kiến trúc cụ thể** áp vào feature đó (không nói chung chung)
+
+## Checklist chấm điểm (0/1/2) — 10 tiêu chí thực chiến
+
+Mỗi tiêu chí:
+- **0 điểm**: hầu như không đáng lo
+- **1 điểm**: có nhưng mức vừa
+- **2 điểm**: rõ ràng, đáng quan tâm
+
+Tổng tối đa: **20**
+
+### 1) Business rule có phức tạp không?
+Hỏi: nhiều rule, validate, phân nhánh, phụ thuộc role/state/policy?
+
+### 2) Logic này có phải core business không?
+Hỏi: sai là ảnh hưởng lớn? có tạo khác biệt sản phẩm?
+
+### 3) Feature có sống lâu và mở rộng nhiều không?
+Hỏi: dài hạn? nền cho nhiều màn hình?
+
+### 4) Nhiều data source/implementation có thể thay đổi không?
+Hỏi: mock/local/remote/cache/offline? khả năng đổi backend contract?
+
+### 5) Logic được dùng ở nhiều UI context không?
+Hỏi: reuse giữa nhiều page/dialog/widget?
+
+### 6) Tần suất thay đổi yêu cầu nghiệp vụ cao không?
+Hỏi: rule/flow hay bị PM/BA chỉnh?
+
+### 7) Hậu quả khi bug xảy ra có lớn không?
+Hỏi: tiền bạc/dữ liệu/vận hành/quyền hạn?
+
+### 8) Có cần test nghiệp vụ độc lập UI không?
+Hỏi: cần unit test input/output matrix mà không render React?
+
+### 9) Nhiều người/nhiều team cùng chạm feature không?
+Hỏi: nhiều contributor? onboarding? rủi ro đặt logic “mỗi người một chỗ”?
+
+### 10) UI có nguy cơ thành “God component” không?
+Hỏi: component/hook phình (fetch + mapping + validate + orchestration + URL state trộn)?
+
+## Công thức ra quyết định
+
+- **0–6** → **Pragmatic structure** là đủ
+- **7–13** → **Clean architecture mức vừa**
+- **14–20** → **Strict hơn**
+
+## Repo-specific heuristics (dựa trên “logic hiện tại”)
+
+### Nhận diện “clean-ish boundaries” theo cấu trúc feature
+
+Nếu feature đã có các folder kiểu:
+- `domain/` (types/models/schemas)
+- `application/use-cases/` (orchestration/normalize/validate flow)
+- `application/ports/` (interfaces)
+- `adapters/` (implementation: http, cache, persistence)
+- `composition/*.container.ts` (composition root cho repo + use case)
+- `presentation/` (components/hooks/lib)
+
+…thì khi thay đổi, **ưu tiên giữ boundaries** (không kéo raw API/fetch/mappers xuyên vào `presentation/`).
+
+### Tín hiệu “pragmatic” (được phép đơn giản)
+
+Chọn pragmatic nếu:
+- Use-case chỉ normalize params / mapping nhẹ, ít rule nghiệp vụ
+- Repository chỉ có 1 implementation rõ ràng (vd. HTTP) và ít khả năng đổi
+- UI chủ yếu render + state đơn giản, không cần test matrix nghiệp vụ
+
+Hành động khuyến nghị:
+- Giữ `presentation/` gọn, logic UI nằm trong hook/component nếu chỉ phục vụ 1 màn hình
+- Không cần tách thêm ports/adapters nếu chưa có biến động implementation
+
+### Tín hiệu “clean vừa / strict hơn” (cần tách rõ)
+
+Nâng level nếu thấy:
+- `presentation` ôm quá nhiều orchestration (URL state + query + mutation + dialog state + mapping)
+- Có nhiều use-case (search/create/update/delete/detail) và dễ mở rộng policy/validate
+- Nhu cầu test độc lập tăng (input validation, normalize, edge-case)
+
+Hành động khuyến nghị:
+- Đẩy normalize/validate/flow orchestration vào `application/use-cases`
+- Đảm bảo mọi IO đi qua `application/ports` + `adapters` (không gọi `api/*.client` trực tiếp từ `presentation`)
+- Giữ `composition/*.container.ts` là nơi “wire” repo + use-case
+
+## Baseline đánh giá (tham chiếu 2 feature hiện có)
+
+### `features/products`
+
+Quan sát: đã có `domain/application/ports/adapters/composition/presentation`, use-case `search-products.use-case.ts` chủ yếu normalize params; repository HTTP có mapping/parse.
+
+Baseline score gợi ý: **0–6 (pragmatic)** hoặc **7–10 (clean vừa)** tùy phạm vi thay đổi.
+
+- Nếu chỉ thêm UI/formatting/filter nhỏ: giữ pragmatic, không over-engineer.
+- Nếu bắt đầu thêm rule pricing/permission/quota (core): re-score lại, có thể nâng lên clean vừa/strict.
+
+### `features/products-portal`
+
+Quan sát: CRUD + URL state + query/mutation + dialog orchestration; component page/toolbar/form khá “đậm” logic; feature có nhiều use-case (search/create/update/delete/detail).
+
+Baseline score gợi ý: **14+ (clean rõ ràng, gần strict)**.
+
+Ưu tiên khi sửa:
+- Không để `presentation` gọi raw API trực tiếp; mọi IO qua `use-cases`/`repository`.
+- Những rule validate/normalize/flow nên nằm ở `domain/` + `application/`.
+
+## Output format bắt buộc (khi đánh giá)
+
+Trả lời theo format:
+
+- **Feature**: <path>
+- **Score**: X/20
+- **Recommendation**: pragmatic | clean-vừa | strict
+- **High-signal reasons**:
+  - ...
+- **Next actions in this repo**:
+  - (nêu rõ file/folder sẽ chạm, ví dụ: thêm use-case ở `application/use-cases/`, thêm method trong `application/ports/`, implement ở `adapters/`, wire tại `composition/`)
