@@ -93,7 +93,7 @@ export function ProductsPortalPage() {
           />
           <ProductsPagination
             page={params.page}
-            limit={params.limit}
+            pageSize={params.pageSize}
             total={pageData.total}
             onPageChange={(nextPage) =>
               setUrlState(

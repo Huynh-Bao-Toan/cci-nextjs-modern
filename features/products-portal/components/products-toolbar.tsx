@@ -32,7 +32,7 @@ export type ProductsUrlStateSetter = (
     sortBy: string | null;
     sortOrder: string | null;
     page: number;
-    limit: number;
+    pageSize: number;
   }>,
   options?: {
     history?: "push" | "replace";

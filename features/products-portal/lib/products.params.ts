@@ -46,7 +46,7 @@ export function normalizeProductsSearchParams(
     sortBy: input.sortBy,
     sortOrder: input.sortOrder,
     page: input.page,
-    limit: input.limit,
+    pageSize: input.pageSize,
   }
 
   return omitBy(normalized, isNil) as unknown as ProductsSearchParams
@@ -58,6 +58,6 @@ export const productsSearchParamsUrlSchema = z.object({
   sortBy: z.string().optional(),
   sortOrder: z.string().optional(),
   page: z.number().optional(),
-  limit: z.number().optional(),
+  pageSize: z.number().optional(),
 })
 

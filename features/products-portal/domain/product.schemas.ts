@@ -40,3 +40,6 @@ export const createProductInputSchema = z.object({
 
 export const updateProductInputSchema = createProductInputSchema.partial()
 
+export type CreateProductInput = z.infer<typeof createProductInputSchema>
+export type UpdateProductInput = z.infer<typeof updateProductInputSchema>
+

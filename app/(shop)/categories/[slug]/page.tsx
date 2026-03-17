@@ -7,8 +7,10 @@ import { SectionHeading } from "@/components/shared/section-heading";
 
 import { ProductGrid } from "@/features/products/components/product-grid";
 import { FavoriteToggle } from "@/features/products/components/favorite-toggle";
-import { getCategories } from "@/features/products/server/get-categories";
-import { getProducts } from "@/features/products/server/get-products";
+import {
+  getCategories,
+  searchProducts,
+} from "@/features/products/composition/products.container";
 import { parseProductSearchParams } from "@/features/products/lib/product.params";
 
 export default async function CategoryPage(
@@ -28,7 +30,7 @@ export default async function CategoryPage(
     category: normalizedSlug,
   });
 
-  const pageData = await getProducts(parsedParams);
+  const pageData = await searchProducts(parsedParams);
   const hasResults = pageData.items.length > 0;
 
   return (

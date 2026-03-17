@@ -14,7 +14,7 @@ export const productsUrlState = {
   sortBy: parseAsString.withDefault(""),
   sortOrder: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),
-  limit: parseAsInteger.withDefault(getDefaultProductsSearchParams().limit),
+  pageSize: parseAsInteger.withDefault(getDefaultProductsSearchParams().pageSize),
 }
 
 export type ProductsUrlState = {
@@ -23,7 +23,7 @@ export type ProductsUrlState = {
   sortBy: string
   sortOrder: string
   page: number
-  limit: number
+  pageSize: number
 }
 
 export const PRODUCTS_URL_STATE_OPTS_FILTER = {
@@ -51,7 +51,7 @@ export function toProductsSearchParams(state: ProductsUrlState): ProductsSearchP
     sortBy: state.sortBy || undefined,
     sortOrder: state.sortOrder || undefined,
     page: state.page,
-    limit: state.limit,
+    pageSize: state.pageSize,
   }
 
   const parsed = productsSearchParamsSchema.safeParse(candidate)

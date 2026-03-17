@@ -1,3 +1,5 @@
+export type ProductId = number;
+
 export type Product = {
   id: number;
   title: string;
@@ -11,12 +13,5 @@ export type Product = {
   thumbnailUrl: string;
   imageUrls: string[];
   tags: string[];
-};
-
-export type PaginatedProducts = {
-  items: Product[];
-  total: number;
-  page: number;
-  pageSize: number;
 };
 

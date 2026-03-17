@@ -1,13 +1,11 @@
-import { z } from "zod";
+import {
+  productsSearchParamsSchema,
+  type ProductsSearchParams,
+} from "../domain/products.models";
 
-export const productSearchParamsSchema = z.object({
-  q: z.string().trim().optional(),
-  category: z.string().trim().optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(48).default(12),
-});
+export const productSearchParamsSchema = productsSearchParamsSchema;
 
-export type ProductSearchParams = z.infer<typeof productSearchParamsSchema>;
+export type ProductSearchParams = ProductsSearchParams;
 
 export function parseProductSearchParams(
   searchParams: Record<string, string | string[] | undefined>,

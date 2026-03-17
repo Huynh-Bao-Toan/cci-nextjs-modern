@@ -1,4 +1,5 @@
 import type { Product } from "../domain/product.types"
+import type { CreateProductInput, UpdateProductInput } from "../domain/product.schemas"
 
 export type RawProduct = {
   id: number
@@ -32,22 +33,7 @@ export type RawCategory =
 
 export type RawCategoriesResponse = RawCategory[]
 
-export type CreateProductInput = {
-  title: string
-  description?: string
-  price: number
-  stock: number
-  brand?: string
-  category: string
-  thumbnail?: string
-}
-
-export type UpdateProductInput = Partial<
-  Pick<
-    CreateProductInput,
-    "title" | "description" | "price" | "stock" | "brand" | "category" | "thumbnail"
-  >
->
+export type { CreateProductInput, UpdateProductInput }
 
 export type ApiProduct = Product
 

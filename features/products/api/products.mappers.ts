@@ -1,9 +1,13 @@
+import type { PaginatedProducts } from "../domain/products.models";
+import type { Product } from "../domain/product.types";
+import {
+  rawProductSchema,
+  rawProductsResponseSchema,
+} from "./products.schemas";
 import type { RawProduct, RawProductsResponse } from "./products.types";
-import type { PaginatedProducts, Product } from "../domain/product.types";
-import { productsResponseSchema, productSchema } from "./products.schemas";
 
 export function mapRawProduct(raw: RawProduct): Product {
-  const parsed = productSchema.parse(raw);
+  const parsed = rawProductSchema.parse(raw);
 
   return {
     id: parsed.id,
@@ -25,7 +29,7 @@ export function mapRawProductsResponse(
   raw: RawProductsResponse,
   pageSize: number,
 ): PaginatedProducts {
-  const parsed = productsResponseSchema.parse(raw);
+  const parsed = rawProductsResponseSchema.parse(raw);
   const items = parsed.products.map(mapRawProduct);
   const page = Math.floor(parsed.skip / parsed.limit) + 1;
 
@@ -36,4 +40,3 @@ export function mapRawProductsResponse(
     pageSize,
   };
 }
-

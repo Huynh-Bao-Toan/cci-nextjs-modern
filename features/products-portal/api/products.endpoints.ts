@@ -11,8 +11,8 @@ import type {
 import { productsApiClient, toProductsApiError } from "./products.client"
 
 function buildListSearchParams(params: ProductsSearchParams) {
-  const limit = params.limit
-  const skip = (params.page - 1) * params.limit
+  const limit = params.pageSize
+  const skip = (params.page - 1) * params.pageSize
 
   const searchParams = new URLSearchParams()
   searchParams.set("limit", String(limit))

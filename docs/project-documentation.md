@@ -1,5 +1,10 @@
 # Tài liệu kỹ thuật dự án cci-nextjs-modern
 
+## Nguồn tài liệu chính thống
+
+- Kiến trúc Clean Architecture chính thức: `docs/architecture.md`.
+- Tài liệu này giữ vai trò overview sản phẩm, stack kỹ thuật, và flow triển khai.
+
 ## 1. Tổng quan dự án (Overview)
 
 Dự án là một mini commerce catalog xây trên Next.js App Router, gồm 2 mặt chức năng chính:
@@ -88,7 +93,7 @@ Cây thư mục rút gọn theo hiện trạng:
       not-found.tsx
     features/
       products/
-        api/ domain/ server/ lib/ hooks/ store/ components/
+        api/ domain/ application/ adapters/ composition/ lib/ hooks/ store/ components/
       products-portal/
         api/ domain/ lib/ hooks/ components/
     components/
@@ -119,8 +124,8 @@ Vai trò chính:
 
 Shared vs feature-based:
 
-- Shared: components/shared, components/ui, lib/api, providers.
-- Feature-based: features/products/_ và features/products-portal/_.
+- Shared: `components/shared`, `components/ui`, `lib/api`, `providers`.
+- Feature-based: `features/products/*` và `features/products-portal/*`.
 
 Lưu ý nhất quán cấu trúc:
 
@@ -129,44 +134,13 @@ Lưu ý nhất quán cấu trúc:
 
 ## 4. Kiến trúc tổng thể (Architecture)
 
-Dự án đang dùng mô hình feature-module + layered architecture.
+Dự án dùng mô hình feature-module + layered architecture. Chi tiết chính thống về layer, dependency rule, runtime flow và checklist Clean Architecture được quản lý tại `docs/architecture.md` để tránh trùng lặp và lệch phiên bản giữa các tài liệu.
 
-### Layer phân chia theo code thực tế
+Tóm tắt nhanh:
 
-- UI layer:
-  - app/_, components/shared/_, components/ui/\*, feature components.
-- Feature orchestration layer:
-  - features/_/components, features/_/hooks, features/\*/lib.
-- Domain layer:
-  - features/\*/domain (type/schema/model).
-- API layer:
-  - features/\*/api (types, schemas, endpoints, mappers).
-- Data access/shared infra:
-  - lib/api/http.ts, lib/api/env.ts, providers/query-provider.tsx.
-
-Ví dụ dòng chảy trong feature products:
-
-- app/(shop)/products/page.tsx
-- parseProductSearchParams trong features/products/lib/product-query-params.ts
-- getProducts trong features/products/server/get-products.ts
-- httpGetJson ở lib/api/http.ts
-- mapRawProductsResponse ở features/products/api/products.mapper.ts
-- render ProductGrid ở features/products/components/product-grid.tsx
-
-Ví dụ dòng chảy trong feature products-portal:
-
-- app/(portal)/products-portal/page.tsx prefetch productsQueries.\*
-- HydrationBoundary truyền state xuống client
-- ProductsPortalPage dùng useProductsQuery/useCategoriesQuery
-- products.endpoints.ts gọi axios client
-- products.mappers.ts map raw -> domain
-- ProductsTable/ProductFormDialog/DeleteProductAlert render và mutate
-
-Lợi ích của tổ chức hiện tại:
-
-- Dễ mở rộng theo feature mà không dồn logic vào app layer.
-- Tách domain model khỏi API shape, giảm coupling với backend payload.
-- Cho phép 2 chiến lược fetch/render khác nhau cùng tồn tại (server-first và client-driven).
+- Shop (`features/products`): server-first, composition + use-cases + repository adapter.
+- Portal (`features/products-portal`): client-driven với React Query + URL state (`nuqs`).
+- Cả hai cùng áp dụng mapping raw API -> domain tại boundary adapter/API.
 
 ## 5. Routing và Rendering
 
@@ -210,7 +184,7 @@ Client Component:
 
 Khi nào fetch server vs client:
 
-- Shop pages fetch ở server qua features/products/server/\* và lib/api/http.ts.
+- Shop pages fetch ở server qua `features/products/composition/products.container.ts` (đi qua application use-cases + adapter + API layer).
 - Portal route prefetch server bằng QueryClient, sau đó client tiếp tục query/mutation qua React Query + axios.
 
 Lý do chọn hybrid này (theo code):
@@ -226,15 +200,15 @@ Flow chính:
 
 - URL search params
 - parseProductSearchParams (Zod)
-- getProducts/getCategories (server)
-- httpGetJson (fetch)
-- products.mapper map raw -> domain
+- searchProducts/getCategories (composition facade)
+- application use-cases + products-http.repository
+- products.endpoints + products.mappers map raw -> domain
 - ProductGrid + Pagination render
 
 Chi tiết:
 
-- parseProductSearchParams trong features/products/lib/product-query-params.ts flatten string|string[] -> string rồi parse.
-- get-products.ts tách 3 nhánh endpoint: /products/search, /products/category/:slug, /products.
+- parseProductSearchParams trong features/products/lib/product.params.ts flatten string|string[] -> string rồi parse.
+- search-products.use-case normalize params, repository chọn endpoint: /products/search, /products/category/:slug, /products.
 - Cache strategy:
   - search dùng no-store.
   - list/category/categories dùng force-cache.

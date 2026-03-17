@@ -19,8 +19,7 @@ export type PaginatedProducts = {
   items: Array<z.infer<typeof productSchema>>
   total: number
   page: number
-  limit: number
-  skip: number
+  pageSize: number
 }
 
 export const productsSearchParamsSchema = z.object({
@@ -29,7 +28,7 @@ export const productsSearchParamsSchema = z.object({
   sortBy: productsSortBySchema.optional(),
   sortOrder: sortOrderSchema.optional(),
   page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(5).max(50).default(12),
+  pageSize: z.coerce.number().int().min(5).max(50).default(12),
 })
 
 export type ProductsSearchParams = z.infer<typeof productsSearchParamsSchema>
