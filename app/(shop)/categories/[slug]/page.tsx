@@ -10,7 +10,7 @@ import { FavoriteToggle } from "@/features/products/presentation/components/favo
 import {
   getCategories,
   searchProducts,
-} from "@/features/products/adapters/products.container";
+} from "@/features/products/composition/products.container";
 import { parseProductSearchParams } from "@/features/products/presentation/lib/product.params";
 
 export default async function CategoryPage(

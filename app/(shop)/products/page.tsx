@@ -10,7 +10,7 @@ import { ProductListToolbar } from "@/features/products/presentation/components/
 import {
   getCategories,
   searchProducts,
-} from "@/features/products/adapters/products.container";
+} from "@/features/products/composition/products.container";
 import { parseProductSearchParams } from "@/features/products/presentation/lib/product.params";
 import { buildProductsHref } from "@/features/products/presentation/lib/product-urls";
 

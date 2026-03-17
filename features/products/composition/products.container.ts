@@ -1,4 +1,4 @@
-import { ProductsHttpRepository } from "../repositories/products-http.repository";
+import { ProductsHttpRepository } from "../adapters/products-http.repository";
 import { getCategoriesUseCase } from "../application/use-cases/get-categories.use-case";
 import { getProductDetailUseCase } from "../application/use-cases/get-product-detail.use-case";
 import { getRelatedProductsUseCase } from "../application/use-cases/get-related-products.use-case";
