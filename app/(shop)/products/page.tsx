@@ -4,11 +4,13 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Pagination } from "@/components/shared/pagination";
 import { SectionHeading } from "@/components/shared/section-heading";
 
-import { getCategories } from "@/features/products/server/get-categories";
-import { getProducts } from "@/features/products/server/get-products";
 import { ProductGrid } from "@/features/products/components/product-grid";
 import { FavoriteToggle } from "@/features/products/components/favorite-toggle";
 import { ProductListToolbar } from "@/features/products/components/product-list-toolbar";
+import {
+  getCategories,
+  searchProducts,
+} from "@/features/products/composition/products.container";
 import { parseProductSearchParams } from "@/features/products/lib/product.params";
 import { buildProductsHref } from "@/features/products/lib/product-urls";
 
@@ -23,7 +25,7 @@ export default async function ProductsPage({
   const parsedParams = parseProductSearchParams(resolvedSearchParams);
   const [categories, pageData] = await Promise.all([
     getCategories(),
-    getProducts(parsedParams),
+    searchProducts(parsedParams),
   ]);
 
   const hasResults = pageData.items.length > 0;

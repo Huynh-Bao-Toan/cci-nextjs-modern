@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import type { ProductId } from "../domain/product.types"
-import { deleteProduct } from "../api/products.endpoints"
+import { deleteProduct } from "../composition/products.container"
 import { productsKeys } from "../lib/products.keys"
 import type { PaginatedProducts } from "../domain/products.models"
 

@@ -19,7 +19,7 @@ Triết lý chính:
   - **Domain model** (`domain/*.types.ts`, `domain/*.models.ts`)
   - UI chỉ làm việc với **domain model**, không chạm trực tiếp vào raw API response.
 - **URL là nguồn sự thật cho state tìm kiếm/lọc/phân trang**:
-  - Feature shop: `features/products/lib/product-query-params.ts`, `product-url-state.ts`.
+  - Feature shop: `features/products/lib/product.params.ts`, `product-url-state.ts`.
   - Portal: `features/products-portal/lib/products.params.ts`, `products.url-state.ts`.
 
 Nhờ cách tổ chức này, developer mới có thể nhìn route trong `app/`, lần theo sang `features/*`, và nhanh chóng nắm được data flow, nơi đặt logic, nơi đặt UI.
@@ -41,10 +41,10 @@ Nhờ cách tổ chức này, developer mới có thể nhìn route trong `app/`
 **Code điển hình**
 
 - `app/layout.tsx`: root layout, import `AppProviders` và global styles.
-- `app/(marketing)/page.tsx`: homepage marketing, gọi `getCategories` từ `features/products/server/get-categories`.
+- `app/(marketing)/page.tsx`: homepage marketing, gọi `getCategories` từ `features/products/composition/products.container`.
 - `app/(shop)/layout.tsx`: bọc các route shop trong `PageShell`.
 - `app/(shop)/products/page.tsx`: server component cho listing products, dùng:
-  - `getProducts`, `getCategories` (server layer trong `features/products/server`),
+  - `searchProducts`, `getCategories` (composition layer trong `features/products/composition`),
   - `parseProductSearchParams`, `buildProductsHref` (URL/state helper trong `features/products/lib`),
   - `ProductGrid`, `FavoriteToggle`, `ProductListToolbar` (UI feature).
 - `app/(portal)/products-portal/page.tsx`: route portal dùng React Query + URL state + hydration:
@@ -70,7 +70,7 @@ Nhờ cách tổ chức này, developer mới có thể nhìn route trong `app/`
   - `lib/` – helper, URL/params, keys/queries, constants,...
   - `hooks/` – custom hooks của feature.
   - `components/` – UI gắn liền với nghiệp vụ feature.
-  - `server/` – server functions dùng trong route (shop).
+  - `application/`, `adapters/`, `composition/` – clean architecture layers cho shop.
   - `store/` – state management cục bộ của feature (VD favorites).
 
 **Ví dụ feature hiện có**
@@ -227,16 +227,28 @@ features/products/
   api/
     products.types.ts
     products.schemas.ts
+    products.mappers.ts
     products.mapper.ts
+    products.endpoints.ts
+    products.client.ts
   domain/
     product.types.ts
-  server/
-    get-products.ts
-    get-product-by-id.ts
-    get-categories.ts
-    get-related-products.ts
+    products.models.ts
+    product.schemas.ts
+  application/
+    ports/
+      products.repository.ts
+    use-cases/
+      search-products.use-case.ts
+      get-product-detail.use-case.ts
+      get-related-products.use-case.ts
+      get-categories.use-case.ts
+  adapters/
+    products-http.repository.ts
+  composition/
+    products.container.ts
   lib/
-    product-query-params.ts
+    product.params.ts
     product-url-state.ts
     product-urls.ts
     product-formatters.ts
@@ -267,7 +279,7 @@ features/products/
 - `*.types.ts`: mô tả **raw API** đúng như response từ DummyJSON.
 - `*.schemas.ts`: dùng `zod` để validate và chuẩn hóa raw response.
 - `*.mapper.ts` / `*.mappers.ts`: chuyển từ **raw** sang **domain**:
-  - Ví dụ `features/products/api/products.mapper.ts`:
+  - Ví dụ `features/products/api/products.mappers.ts`:
     - `mapRawProduct`:
       - Parse bằng `productSchema.parse`.
       - Map field `thumbnail` → `thumbnailUrl`, `images` → `imageUrls`, handle field optional.
@@ -280,18 +292,20 @@ features/products/
   - `products.schemas.ts`: schema validate raw list/categories.
   - `products.endpoints.ts`: functions như `searchProducts`, `getCategories`, `createProduct`, `updateProduct`, `deleteProduct`.
 
-### `server/` – server functions (shop)
+### `application/` + `adapters/` + `composition/` – clean architecture core (shop)
 
-- Các hàm chạy trên server (Route Handler/Server Component) để gọi API qua wrapper `httpGetJson`:
-  - `get-products.ts`, `get-product-by-id.ts`, `get-categories.ts`, `get-related-products.ts`.
-- Lợi ích:
-  - Tách Next.js data fetching ra khỏi UI.
-  - Dễ tái sử dụng giữa nhiều route nếu cần.
+- `application/`:
+  - `ports/products.repository.ts`: định nghĩa contract data access.
+  - `use-cases/*`: business rules, normalize/validate, không phụ thuộc Next.js/HTTP concrete.
+- `adapters/products-http.repository.ts`:
+  - Implement `ProductsRepository`, gọi API endpoints và map raw -> domain.
+- `composition/products.container.ts`:
+  - Wiring concrete repository vào use-cases, export facade cho app routes dùng trực tiếp.
 
 ### `lib/` – helper & URL state (feature-level)
 
 - **Shop (`features/products/lib`)**
-  - `product-query-params.ts`:
+  - `product.params.ts`:
     - Dùng `zod` để parse/validate `searchParams` từ URL.
   - `product-url-state.ts`:
     - Dùng `nuqs` để định nghĩa shape state URL (`q`, `category`, `page`) và options (history replace/push).
@@ -366,11 +380,13 @@ Các hậu tố file thể hiện rõ **vai trò kiến trúc**:
 
 - **`.mapper.ts` / `.mappers.ts`**
   - Map **Raw API → Domain model**:
-    - `features/products/api/products.mapper.ts`.
+    - `features/products/api/products.mappers.ts` (file chính).
+    - `features/products/api/products.mapper.ts` (compat re-export).
     - `features/products-portal/api/products.mappers.ts`.
 
 - **`.endpoints.ts`**
   - Tập trung các hàm gọi API backend:
+    - `features/products/api/products.endpoints.ts`.
     - `features/products-portal/api/products.endpoints.ts`.
   - Thường trả về **raw type**, để mapper hoặc React Query xử lý tiếp.
 
@@ -379,7 +395,7 @@ Các hậu tố file thể hiện rõ **vai trò kiến trúc**:
 - **`.params.ts`**
   - Parse/normalize **query params** từ URL thành cấu trúc typed:
     - `features/products-portal/lib/products.params.ts`.
-    - `features/products/lib/product-query-params.ts` (tên hơi khác nhưng cùng vai trò).
+    - `features/products/lib/product.params.ts`.
 
 - **`.url-state.ts`**
   - Định nghĩa **shape state đồng bộ với URL** bằng `nuqs`:
@@ -486,12 +502,12 @@ Ví dụ route: `app/(shop)/products/page.tsx`
 
 1. **URL search params** đi vào `ProductsPage`:
    - Prop `searchParams` (Next App Router).
-   - Gọi `parseProductSearchParams` trong `features/products/lib/product-query-params.ts`.
+   - Gọi `parseProductSearchParams` trong `features/products/lib/product.params.ts`.
 2. **Server data fetching**:
-   - `getProducts(parsedParams)` trong `features/products/server/get-products.ts`:
-     - Dùng `httpGetJson` (`lib/api/http.ts`) gọi DummyJSON.
-     - Parse raw response bằng `productsResponseSchema`.
-     - Map sang `PaginatedProducts` domain (qua mapper).
+   - `searchProducts(parsedParams)` trong `features/products/composition/products.container.ts`:
+     - Composition gọi `search-products.use-case.ts`.
+     - Use-case gọi `ProductsHttpRepository` (adapter).
+     - Adapter dùng `products.endpoints.ts` + `products.mappers.ts` để gọi DummyJSON và map raw -> domain.
 3. **Domain → UI**:
    - `ProductGrid` nhận `products: Product[]`.
    - `FavoriteToggle` dùng `useFavorites` để thao tác `favorites.store.ts`.
@@ -502,8 +518,10 @@ Tóm tắt:
 ```text
 URL search params
   ↓ parseProductSearchParams (zod)
-Server fetch (httpGetJson → DummyJSON)
-  ↓ products.schemas + products.mapper
+Composition facade
+  ↓ use-case + repository adapter
+API fetch (products.endpoints.ts → DummyJSON)
+  ↓ products.schemas + products.mappers
 Domain Product / PaginatedProducts
   ↓
 Feature components (ProductGrid, FavoriteToggle, Pagination)
@@ -554,7 +572,7 @@ Project sử dụng **URL như single source of truth** cho search/filter/pagina
 
 ### 7.1. Shop: `features/products/lib/*`
 
-- `product-query-params.ts`:
+- `product.params.ts`:
   - Parse `searchParams` thô từ Next (string | string[] | undefined).
   - Flatten thành object `{ [key: string]: string }`.
   - Validate bằng `zod` với default `page`, `pageSize`.
@@ -655,7 +673,7 @@ Nguyên tắc:
   - Mapping, validate, normalize params, tạo query keys… được làm ở `lib/`, `api/`, `domain/`, `hooks/`.
 
 - **State management rõ ràng**:
-  - Server state → React Query (portal) hoặc server functions + fetch (shop).
+  - Server state → React Query (portal) hoặc composition + use-cases + adapter (shop).
   - Client local state (favorites) → Zustand store trong `features/products/store`.
   - URL state → `nuqs` + `*.url-state.ts`.
 

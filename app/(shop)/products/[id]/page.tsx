@@ -7,8 +7,10 @@ import { ProductGallery } from "@/features/products/components/product-gallery";
 import { ProductPrice } from "@/features/products/components/product-price";
 import { ProductGrid } from "@/features/products/components/product-grid";
 import { FavoriteToggle } from "@/features/products/components/favorite-toggle";
-import { getProductById } from "@/features/products/server/get-product-by-id";
-import { getRelatedProducts } from "@/features/products/server/get-related-products";
+import {
+  getProductDetail,
+  getRelatedProducts,
+} from "@/features/products/composition/products.container";
 
 type ProductDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -23,7 +25,10 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  const product = await getProductById(id);
+  const product = await getProductDetail(id);
+  if (!product) {
+    notFound();
+  }
 
   const relatedPromise = getRelatedProducts(product.category, product.id);
 

@@ -35,3 +35,7 @@ export const categoriesResponseSchema = z.array(
 
 export type ProductSchema = z.infer<typeof productSchema>;
 
+export const rawProductSchema = productSchema;
+export const rawProductsResponseSchema = productsResponseSchema;
+export const rawCategoriesResponseSchema = categoriesResponseSchema;
+

@@ -4,18 +4,18 @@ import { Button } from "@/components/ui/button"
 
 type ProductsPaginationProps = {
   page: number
-  limit: number
+  pageSize: number
   total: number
   onPageChange: (page: number) => void
 }
 
 export function ProductsPagination({
   page,
-  limit,
+  pageSize,
   total,
   onPageChange,
 }: ProductsPaginationProps) {
-  const pageCount = Math.max(1, Math.ceil(total / limit))
+  const pageCount = Math.max(1, Math.ceil(total / pageSize))
   if (pageCount <= 1) return null
 
   const clamped = Math.min(Math.max(page, 1), pageCount)

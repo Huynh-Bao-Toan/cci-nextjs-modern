@@ -7,7 +7,7 @@ export const PRODUCTS_DEFAULT_PARAMS: ProductsSearchParams = {
   sortBy: undefined,
   sortOrder: undefined,
   page: 1,
-  limit: 12,
+  pageSize: 12,
 }
 
 export const PRODUCTS_SORT_BY_OPTIONS: Array<{

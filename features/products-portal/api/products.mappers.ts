@@ -26,7 +26,7 @@ export function mapRawProduct(raw: RawProduct): Product {
 
 export function mapRawProductsResponse(
   raw: RawProductsResponse,
-  requested: { page: number; limit: number }
+  requested: { page: number; pageSize: number }
 ): PaginatedProducts {
   const parsed = rawProductsResponseSchema.parse(raw)
   const items = parsed.products.map((product) => mapRawProduct(product as RawProduct))
@@ -35,8 +35,7 @@ export function mapRawProductsResponse(
     items,
     total: parsed.total,
     page: requested.page,
-    limit: parsed.limit,
-    skip: parsed.skip,
+    pageSize: requested.pageSize,
   }
 }
 

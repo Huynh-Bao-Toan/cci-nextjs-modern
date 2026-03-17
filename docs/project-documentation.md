@@ -88,7 +88,7 @@ Cây thư mục rút gọn theo hiện trạng:
       not-found.tsx
     features/
       products/
-        api/ domain/ server/ lib/ hooks/ store/ components/
+        api/ domain/ application/ adapters/ composition/ lib/ hooks/ store/ components/
       products-portal/
         api/ domain/ lib/ hooks/ components/
     components/
@@ -119,8 +119,8 @@ Vai trò chính:
 
 Shared vs feature-based:
 
-- Shared: components/shared, components/ui, lib/api, providers.
-- Feature-based: features/products/_ và features/products-portal/_.
+- Shared: `components/shared`, `components/ui`, `lib/api`, `providers`.
+- Feature-based: `features/products/*` và `features/products-portal/*`.
 
 Lưu ý nhất quán cấu trúc:
 
@@ -147,10 +147,11 @@ Dự án đang dùng mô hình feature-module + layered architecture.
 Ví dụ dòng chảy trong feature products:
 
 - app/(shop)/products/page.tsx
-- parseProductSearchParams trong features/products/lib/product-query-params.ts
-- getProducts trong features/products/server/get-products.ts
-- httpGetJson ở lib/api/http.ts
-- mapRawProductsResponse ở features/products/api/products.mapper.ts
+- parseProductSearchParams trong features/products/lib/product.params.ts
+- searchProducts trong features/products/composition/products.container.ts
+- search-products.use-case trong features/products/application/use-cases/search-products.use-case.ts
+- ProductsHttpRepository trong features/products/adapters/products-http.repository.ts
+- products.endpoints.ts + products.mappers.ts trong features/products/api
 - render ProductGrid ở features/products/components/product-grid.tsx
 
 Ví dụ dòng chảy trong feature products-portal:
@@ -210,7 +211,7 @@ Client Component:
 
 Khi nào fetch server vs client:
 
-- Shop pages fetch ở server qua features/products/server/\* và lib/api/http.ts.
+- Shop pages fetch ở server qua `features/products/composition/products.container.ts` (đi qua application use-cases + adapter + API layer).
 - Portal route prefetch server bằng QueryClient, sau đó client tiếp tục query/mutation qua React Query + axios.
 
 Lý do chọn hybrid này (theo code):
@@ -226,15 +227,15 @@ Flow chính:
 
 - URL search params
 - parseProductSearchParams (Zod)
-- getProducts/getCategories (server)
-- httpGetJson (fetch)
-- products.mapper map raw -> domain
+- searchProducts/getCategories (composition facade)
+- application use-cases + products-http.repository
+- products.endpoints + products.mappers map raw -> domain
 - ProductGrid + Pagination render
 
 Chi tiết:
 
-- parseProductSearchParams trong features/products/lib/product-query-params.ts flatten string|string[] -> string rồi parse.
-- get-products.ts tách 3 nhánh endpoint: /products/search, /products/category/:slug, /products.
+- parseProductSearchParams trong features/products/lib/product.params.ts flatten string|string[] -> string rồi parse.
+- search-products.use-case normalize params, repository chọn endpoint: /products/search, /products/category/:slug, /products.
 - Cache strategy:
   - search dùng no-store.
   - list/category/categories dùng force-cache.
