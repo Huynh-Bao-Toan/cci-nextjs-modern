@@ -10,7 +10,7 @@ import { FavoriteToggle } from "@/features/products/presentation/components/favo
 import {
   getProductDetail,
   getRelatedProducts,
-} from "@/features/products/adapters/products.container";
+} from "@/features/products/composition/products.container";
 
 type ProductDetailPageProps = {
   params: Promise<{ id: string }>;
