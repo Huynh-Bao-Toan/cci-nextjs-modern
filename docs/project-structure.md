@@ -1,5 +1,10 @@
 ## 1. Triết lý kiến trúc & tổng quan thư mục
 
+Ghi chú chuẩn hóa tài liệu:
+
+- Tài liệu kiến trúc chính thống: `docs/architecture.md`.
+- Tài liệu này tập trung vào cấu trúc thư mục, naming convention, và cách tổ chức mã nguồn.
+
 Project được tổ chức theo **feature-first architecture**, kết hợp rõ ràng giữa:
 
 - **App Router layer (`app/`)**: định nghĩa route, layout, boundary (loading/error), quyết định server vs client.
