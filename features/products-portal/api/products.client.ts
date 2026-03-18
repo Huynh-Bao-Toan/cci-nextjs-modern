@@ -1,21 +1,18 @@
-import {
-  ApiClientError,
-  apiClient,
-  toApiClientError,
-  type ApiError,
-} from "@/lib/api/axios.client"
+import { AppApiError, toAppApiError } from "@/lib/api/http-client/index";
 
-export class ProductsApiError extends ApiClientError {
-  constructor(error: ApiError) {
-    super(error)
-    this.name = "ProductsApiError"
+export class ProductsApiError extends AppApiError {
+  constructor(error: AppApiError) {
+    super({
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      details: error.details,
+    });
+    this.name = "ProductsApiError";
   }
 }
 
-export const productsApiClient = apiClient
-
 export function toProductsApiError(error: unknown): ProductsApiError {
-  const base = toApiClientError(error)
-  return new ProductsApiError({ message: base.message, status: base.status })
+  const normalized = toAppApiError(error);
+  return new ProductsApiError(normalized);
 }
-

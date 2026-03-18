@@ -6,7 +6,7 @@ import {
   getProductById as getProductByIdEndpoint,
   searchProducts as searchProductsEndpoint,
   updateProduct as updateProductEndpoint,
-} from "../api/products.endpoints";
+} from "../api/products.api";
 import { mapRawProduct, mapRawProductsResponse } from "../api/products.mappers";
 import { rawCategoriesResponseSchema } from "../api/products.schemas";
 import type {
