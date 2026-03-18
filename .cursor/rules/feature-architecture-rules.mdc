@@ -1,0 +1,256 @@
+---
+description: "Architecture governance: feature-first + progressive layering + inward dependencies (Next.js App Router aligned)."
+globs:
+  - "features/**"
+  - "app/**"
+---
+
+## 1) Purpose / Philosophy (Governance)
+
+Tài liệu này đặt ra **quy tắc kiến trúc thực dụng** để team phát triển feature nhanh mà không làm kiến trúc xấu dần theo thời gian.
+
+- **Feature-first**: mỗi capability có “nhà” riêng trong `features/*` để thay đổi có phạm vi, ownership rõ.
+- **Progressive layering**: bắt đầu tối giản; **chỉ thêm layer khi có tín hiệu** (mục 9).
+- **Inward dependencies**: phụ thuộc đi **hướng vào trong** (UI/integration phụ thuộc core; core không phụ thuộc UI/integration).
+- **Isolate external details**: contract/IO/transport là “detail”, phải bị cô lập để không lan vào model nội bộ và UI.
+
+## 2) Standard Folder Naming (Chuẩn tên folder)
+
+Trong repo này, nếu feature cần tổ chức theo layer, **ưu tiên dùng đúng các tên folder chuẩn sau** để giữ tính nhất quán:
+
+- `domain/`
+- `application/`
+- `adapters/`
+- `api/`
+- `presentation/`
+- `composition/`
+
+### 2.1 Quy ước bắt buộc
+
+- **Bắt buộc**: Không tự ý đổi sang tên khác nếu cùng một vai trò kiến trúc.
+- **Bắt buộc**: Nếu đã có layer tương ứng, phải dùng đúng tên chuẩn của repo.
+- **Khuyến nghị**: Bên trong `application/`, ưu tiên tổ chức:
+  - `application/use-cases/`
+  - `application/ports/`
+
+### 2.2 Ý nghĩa của việc chuẩn hóa tên folder
+
+- Giảm friction khi đọc code giữa các feature.
+- Giúp team scan cấu trúc feature nhanh hơn.
+- Giúp AI tools, review checklist, và refactor workflow hoạt động nhất quán hơn.
+- Tránh tình trạng cùng một responsibility nhưng mỗi feature đặt một kiểu tên khác nhau.
+
+### 2.3 Lưu ý quan trọng
+
+- **Vai trò kiến trúc quan trọng hơn tên folder** về mặt tư duy thiết kế.
+- Nhưng **trong repo này**, khi hiện thực bằng folder, phải **ưu tiên một chuẩn tên duy nhất** để governance có hiệu lực.
+- Chỉ linh hoạt giảm số layer, **không linh hoạt đổi tên layer**.
+
+## 3) Architectural Boundaries (Những ranh giới cần bảo vệ)
+
+Trong repo này, một feature có các vùng trách nhiệm sau:
+
+- **`domain/`**: internal canonical model, schema/validation, normalization nhẹ.
+- **`application/`**: orchestration/policy/use-cases ở mức feature.
+- **`api/`**: raw contracts, endpoint calls, parsing/mapping ở boundary external.
+- **`adapters/`**: implementation dùng `api/` để đáp ứng các ports/contracts của application.
+- **`presentation/`**: component/view, UI state, URL state, query orchestration cho UI.
+- **`composition/`**: wiring dependency và export public surface ổn định để `app/*` và `presentation/*` gọi.
+
+Mục tiêu boundary:
+
+- UI **không** biết chi tiết IO/transport.
+- Internal model **không** bị “nhiễm” raw contract.
+- Use-case **không** bị khóa vào framework.
+
+## 4) Dependency Direction (Bắt buộc)
+
+### 4.1 Quy tắc phụ thuộc tổng quát
+
+- **Bắt buộc**: `domain/` **không import** `presentation/`, `app/`, `api/`, `adapters/`, `composition/`.
+- **Bắt buộc**: `application/` **chỉ import** `domain/` và `application/ports/*` (nếu có).
+- **Bắt buộc**: `api/` **không import** `presentation/`, `app/`, `composition/`.
+- **Bắt buộc**: `adapters/` **không import** `presentation/` hoặc `app/`.
+- **Bắt buộc**: `presentation/` và `app/` **không gọi trực tiếp** transport/client (HTTP/storage) hay raw endpoints; phải đi qua **public surface** của feature tại `composition/`.
+
+### 4.2 Điều được phép (thực dụng)
+
+- `presentation/` có thể import types từ `domain/` để type UI, nhưng **không** import raw contracts từ `api/`.
+- `api/` và `adapters/` có thể dùng shared `@/lib/*` nếu đó là hạ tầng dùng chung (HTTP client, env, utils nền tảng).
+
+## 5) Layer Responsibilities (Đặt đúng thứ đúng chỗ)
+
+### 5.1 `domain/` (frontend domain-like, không phải DDD nặng)
+
+**Mục tiêu**: tạo **internal canonical model** đủ sạch để UI và use-case dùng ổn định.
+
+- **Nên đặt**: types/models nội bộ, schema/validation cho internal model, normalization nhẹ khi có giá trị.
+- **Không đặt**: gọi IO/transport, query keys/options, URL parsing, routing, UI side effects.
+- **Tránh over-modeling**: feature đơn giản có thể chỉ cần `types` + `schema` + 1–2 hàm normalize.
+
+### 5.2 `application/` (use-cases/workflows)
+
+**Mục tiêu**: gom policy + orchestration để UI mỏng, dễ test, dễ reuse.
+
+- **Nên đặt**:
+  - `application/use-cases/`: workflow, policy, branching, guard input
+  - `application/ports/`: contracts/interfaces khi thật sự cần seam
+- **Không đặt**: React/Next code, URL parsing, UI query orchestration, transport-specific calls.
+
+### 5.3 `api/` (external boundary)
+
+**Mục tiêu**: cô lập raw contract và chi tiết external API.
+
+- **Nên đặt**: endpoint calls, raw contract schemas/types, parsing raw response, mapping raw → internal candidate.
+- **Không đặt**: toast/navigation, query keys/options, URL state, UI behavior.
+
+### 5.4 `adapters/` (integration implementation)
+
+**Mục tiêu**: nối `application/` với `api/` và cô lập implementation detail.
+
+- **Nên đặt**: repository/adapters implement ports bằng cách gọi `api/`, map sang `domain/`, translate errors nếu cần.
+- **Không đặt**: UI logic, query orchestration, URL state.
+
+### 5.5 `presentation/`
+
+**Mục tiêu**: UI làm đúng việc của UI: state, rendering, orchestration UI.
+
+- **Nên đặt**: components, hooks, UI state, URL state, query keys/options, form logic, formatting cho hiển thị.
+- **Không đặt**: gọi trực tiếp `api/`/transport; mapping raw → internal.
+
+### 5.6 `composition/`
+
+**Mục tiêu**: seam để thay implementation mà không kéo UI đổi theo; cung cấp public surface ổn định cho feature.
+
+- **Nên chứa**: wiring (tạo adapter/repo, inject vào use-case, export function ready-to-call), cross-cutting theo module khi thật cần.
+- **Không chứa**: UI logic (toast/navigation), query keys/options, URL state, form rules.
+- **Governance**: `composition/` phải **thin**. Nếu composition phình → sai placement.
+
+## 6) Shared Code Placement
+
+- Chỉ đưa code vào shared `@/lib/*` khi:
+  - đã được dùng ở **ít nhất 2 modules/features**, và
+  - semantics đủ tổng quát, không mang ngôn ngữ riêng của một feature.
+- Không đưa logic đặc thù feature vào shared chỉ vì “có thể sau này sẽ reuse”.
+- Anti-goal: biến shared thành dumping ground.
+
+## 7) Next.js App Router: Server/Client Boundary Rules (Bắt buộc)
+
+### 7.1 Mặc định và cách dùng
+
+- `page.tsx`, `layout.tsx` **mặc định là Server Component**.
+- Chỉ dùng `"use client"` khi cần event handlers, effects, browser APIs, client-only libs, hoặc local UI state tương tác.
+
+### 7.2 Governance để tránh “client hóa” cả feature
+
+- **Bắt buộc**: Không đặt `"use client"` quá cao. Đặt client boundary **thấp nhất có thể**.
+- **Bắt buộc**: `"use client"` tạo client boundary cho toàn bộ subtree import phía dưới.
+- **Khuyến nghị**: Tách “shell server” và “island client”.
+
+### 7.3 `server-only` / `client-only`
+
+- Dùng `server-only` cho code chỉ chạy server.
+- Dùng `client-only` cho code phụ thuộc browser APIs.
+- **Bắt buộc**: `presentation/` không import server-only code.
+
+## 8) Data-Fetching Strategy (App Router aligned)
+
+### 8.1 Default approach
+
+- **Mặc định**: bắt đầu từ cấu trúc nhỏ nhất đáp ứng nhu cầu.
+- **Chỉ thêm layer** khi có tín hiệu rõ về: flow complexity, coupling, testability, reuse, data-source volatility, boundary leakage.
+- **Không** tạo ports/use-cases/adapters chỉ để “đúng mô hình”.
+- Nhưng cũng **không** lấy cớ “feature nhỏ” để UI gọi thẳng API và để raw contract lan vào UI.
+
+### 8.2 Khi nào ưu tiên fetch ở Server Component
+
+Ưu tiên server khi nội dung:
+
+- route-driven và phụ thuộc `params/searchParams`
+- cần SSR/initial render tốt hoặc có lợi SEO
+- là request-time data và ít tương tác phức tạp phía client
+
+Governance:
+
+- Server page orchestration phải mỏng: parse `searchParams`, gọi public surface, render.
+- Policy/normalize nằm ở `domain/` hoặc `application/`, không nhét vào page.
+
+### 8.3 Khi nào ưu tiên fetch ở Client Component
+
+Ưu tiên client orchestration khi là:
+
+- dashboard/portal/CRUD
+- filtering/search/sort/pagination giàu tương tác
+- nhiều mutation, optimistic updates
+
+Governance:
+
+- Query keys/options + URL state nằm trong `presentation/`.
+- Client hooks gọi IO qua `composition/`.
+
+### 8.4 Khi nào hydrate initial data
+
+Hydrate khi muốn initial render nhanh nhưng vẫn cần client query lifecycle.
+
+Rule:
+
+- **Tránh duplicate responsibility**: một nguồn chân lý cho query state.
+  - Nếu hydrate: server cấp initial state; client query layer sở hữu lifecycle/refetch.
+  - Nếu không hydrate: client query layer tự fetch; server chỉ render shell.
+
+### 8.5 `searchParams` (server) vs URL state (client)
+
+- Dùng `searchParams` ở server cho route-driven content và initial fetch.
+- Dùng URL state ở client cho UI-driven filters/sort/pagination khi cần tương tác mượt.
+- Không parse/build query string rải rác; gom logic vào `presentation/`.
+
+## 9) Decision Rules (Khi nào tách, khi nào chưa cần, khi nào dừng)
+
+### 9.1 Tách internal model khỏi external model
+
+- **Bắt buộc** nếu contract biến động/khó kiểm soát, cần validation/normalization, hoặc có nhiều nguồn/nhiều bước xử lý.
+- **Có thể tối giản** nếu contract ổn định, feature nhỏ, rủi ro thấp.
+- **Stop rule**: mapping chỉ rename 1:1 và không thêm giá trị → delay.
+
+### 9.2 Thêm `application/use-cases/`
+
+- **Nên** khi flow nhiều bước/policy rõ, reuse nhiều UI contexts, cần test logic độc lập UI/IO, hoặc UI/hook phình.
+- **Chưa cần** khi chỉ pass-through 1 call và không có policy.
+- **Stop rule**: use-case không làm gì ngoài gọi repo → bỏ layer.
+
+### 9.3 Thêm `application/ports/`
+
+- **Nên** khi cần thay implementation (remote/cache/mock/local) hoặc cần test `application/` không phụ thuộc IO.
+- **Chưa cần** khi một implementation chắc chắn dài hạn và feature nhỏ.
+- **Stop rule**: interface không bảo vệ seam nào → không tạo.
+
+### 9.4 Khi nào phải “siết boundary” mạnh hơn
+
+- Khi raw contract lan vào UI/core.
+- Khi UI gọi IO trực tiếp.
+- Khi bugfix bắt đầu chạm nhiều file vì coupling cao.
+
+### 9.5 Khi nào refactor phải dừng
+
+- Khi change chỉ là UI copy/layout hoặc bug nhỏ cục bộ.
+- Khi refactor lan rộng vượt scope ticket.
+- Khi abstraction mới không giảm coupling hoặc không tăng testability.
+
+## 10) Evolution Rules (Sửa feature cũ)
+
+- Feature cũ **không bắt buộc** retrofit đủ mọi layer.
+- **Default**: sửa cục bộ theo responsibility:
+  - UI change → `presentation/`
+  - URL/query change → `presentation/`
+  - contract change → `api/` + `adapters/` + mapping
+- **Opportunistic refactor (scope hẹp)** khi gặp violation rõ: UI gọi IO trực tiếp / raw shape lan / mapping rải rác → đưa về đúng boundary.
+- **Không lan rộng scope** nếu cần đổi hàng loạt chỗ không liên quan hoặc thiếu thời gian test/regression.
+
+## 11) Anti-Patterns (Repo-aligned)
+
+- UI-driven integration: `presentation/` hoặc `app/` gọi thẳng transport/client/storage.
+- Leaky external model: raw contract lan vào `domain/` hoặc UI.
+- Inverted dependencies: core import UI/integration.
+- God component / god hook / god container: ôm quá nhiều responsibility.
+- Ceremony-first: tạo `ports/`, `use-cases/`, `adapters/` cho đủ bộ khi không có signal.
+- Shared dumping ground: đẩy mọi thứ vào shared `@/lib/*` vì “có thể reuse”.
