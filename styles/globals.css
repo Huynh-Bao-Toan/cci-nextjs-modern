@@ -131,3 +131,38 @@
     cursor: pointer;
   }
 }
+
+@layer components {
+  .link-hint {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    margin-left: 0.125rem;
+    background-color: currentColor;
+    opacity: 0;
+    transform: scale(0.7);
+    transition:
+      opacity 150ms ease,
+      transform 200ms ease;
+  }
+
+  .link-hint.is-pending {
+    opacity: 0.75;
+    animation: link-hint-pulse 900ms ease-in-out 100ms infinite;
+    transform: scale(1);
+  }
+
+  @keyframes link-hint-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(0.75);
+    }
+
+    50% {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+  }
+}

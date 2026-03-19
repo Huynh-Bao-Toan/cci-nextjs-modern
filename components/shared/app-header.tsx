@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ModeToggle } from "./mode-toggle";
+import LoadingIndicator from "./loading-indicator";
 
 const navItems = [
   { href: "/products", label: "Products" },
@@ -29,7 +32,10 @@ export function AppHeader() {
                 "rounded-md px-2 py-1 text-muted-foreground transition hover:bg-muted hover:text-foreground",
               )}
             >
-              {item.label}
+              <span className="flex items-center gap-1">
+                {item.label}
+                <LoadingIndicator />
+              </span>
             </Link>
           ))}
           <ModeToggle />
