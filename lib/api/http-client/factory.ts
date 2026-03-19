@@ -95,7 +95,6 @@ function normalizeAppApiError(error: unknown): AppApiError {
 function createDefaultHeaders(extra?: CreateHttpClientOptions["defaultHeaders"]) {
   return {
     Accept: "application/json",
-    "Content-Type": "application/json",
     ...extra,
   };
 }
@@ -148,6 +147,54 @@ function toAxiosConfig<TData>(
   };
 }
 
+function isFormData(value: unknown): value is FormData {
+  return typeof FormData !== "undefined" && value instanceof FormData;
+}
+
+function hasHeader(config: InternalAxiosRequestConfig, name: string): boolean {
+  const headers = config.headers as unknown;
+  if (headers && typeof headers === "object" && "has" in headers && typeof headers.has === "function") {
+    return !!(headers as { has: (key: string) => boolean }).has(name);
+  }
+
+  const raw = (config.headers ?? {}) as Record<string, unknown>;
+  const target = name.toLowerCase();
+  return Object.keys(raw).some((k) => k.toLowerCase() === target);
+}
+
+function setHeader(config: InternalAxiosRequestConfig, name: string, value: string) {
+  const headers = config.headers as unknown;
+  if (headers && typeof headers === "object" && "set" in headers && typeof headers.set === "function") {
+    (headers as { set: (key: string, value: string) => void }).set(name, value);
+    return;
+  }
+
+  config.headers = {
+    ...(config.headers ?? {}),
+    [name]: value,
+  } as AxiosRequestHeaders;
+}
+
+function deleteHeader(config: InternalAxiosRequestConfig, name: string) {
+  const headers = config.headers as unknown;
+  if (
+    headers &&
+    typeof headers === "object" &&
+    "delete" in headers &&
+    typeof headers.delete === "function"
+  ) {
+    (headers as { delete: (key: string) => void }).delete(name);
+    return;
+  }
+
+  const raw = (config.headers ?? {}) as Record<string, unknown>;
+  const target = name.toLowerCase();
+  for (const k of Object.keys(raw)) {
+    if (k.toLowerCase() === target) delete (raw as Record<string, unknown>)[k];
+  }
+  config.headers = raw as AxiosRequestHeaders;
+}
+
 export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
   const instance: AxiosInstance = axios.create({
     baseURL: options.baseURL,
@@ -160,6 +207,25 @@ export function createHttpClient(options: CreateHttpClientOptions): HttpClient {
   instance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
     const nextConfig = config as RequestConfigWithMeta;
     nextConfig._meta = { startedAt: Date.now() };
+
+    // Header policy (per-request):
+    // - Do not force Content-Type by default (e.g. GET/no body)
+    // - If data is FormData, never set Content-Type (let Axios/browser set boundary)
+    // - If data is JSON-like payload, ensure application/json (unless caller overrides)
+    const data = (nextConfig as InternalAxiosRequestConfig & { data?: unknown }).data;
+    if (isFormData(data)) {
+      deleteHeader(nextConfig, "Content-Type");
+    } else if (data !== undefined && data !== null) {
+      const isJsonLike =
+        typeof data === "object" ||
+        typeof data === "string" ||
+        typeof data === "number" ||
+        typeof data === "boolean";
+
+      if (isJsonLike && !hasHeader(nextConfig, "Content-Type")) {
+        setHeader(nextConfig, "Content-Type", "application/json");
+      }
+    }
 
     const accessToken = await options.getAccessToken?.();
     if (accessToken) {

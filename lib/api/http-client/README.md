@@ -1,11 +1,11 @@
 # Client-only HTTP client
 
-`@/lib/api/http/index` provides a reusable Axios factory for FE-only modules.
+`@/lib/api/http-client/index` provides a reusable Axios factory for FE-only modules.
 
 ## Create a client per API
 
 ```ts
-import { createHttpClient } from "@/lib/api/http/index";
+import { createHttpClient } from "@/lib/api/http-client/index";
 import { ApiService, apiBaseUrls } from "@/lib/constants/apis";
 
 export const http = createHttpClient({
@@ -33,7 +33,6 @@ await http.delete(`/products/${id}`);
 const controller = new AbortController();
 
 await http.post("/files/upload", formData, {
-  headers: { "Content-Type": "multipart/form-data" },
   signal: controller.signal,
 });
 
@@ -43,6 +42,11 @@ await http.get<Blob>("/files/report", {
   headers: { Accept: "application/pdf" },
 });
 ```
+
+## Notes
+
+- Với `FormData`, **không set `Content-Type` thủ công** (Axios/browser sẽ tự set boundary).
+- Với payload JSON, client sẽ đảm bảo gửi `Content-Type: application/json` (trừ khi bạn override).
 
 ## TanStack Query usage
 
