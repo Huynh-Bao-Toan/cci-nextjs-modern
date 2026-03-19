@@ -42,6 +42,15 @@ const product = await http.get<Product>(`/products/${id}`, {
 const data = await http.get<Data>("/data", {
   next: { revalidate: 3600, tags: ["products"] },
 });
+
+// Hoặc dùng helper cacheOptions (map sang cache + next)
+const categories = await http.get<string[]>("/products/categories", {
+  cacheOptions: {
+    mode: "force-cache",
+    revalidate: 3600,
+    tags: ["products:categories"],
+  },
+});
 ```
 
 ---
@@ -151,3 +160,4 @@ const result = await http.request<MyResponse>({
 
 - `http-server` **không parse body** cho `HEAD` và các status **204 / 205 / 304** (trả về `undefined`).
 - Với `responseType: "json"`, `http-server` **chỉ parse JSON khi `content-type` là JSON**; nếu không sẽ throw `HttpServerError` với message rõ ràng.
+- Dev log của `http-server` không còn phụ thuộc thời gian hệ thống trong request flow (an toàn hơn với prerender/cache components).

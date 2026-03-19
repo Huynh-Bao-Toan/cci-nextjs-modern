@@ -53,6 +53,17 @@ export type SearchParams =
  */
 export type HttpResponseType = "json" | "text" | "blob";
 
+/**
+ * Cache policy helpers for Next.js `fetch`.
+ * `mode` maps to `fetch(..., { cache })`.
+ * `revalidate` and `tags` map to `fetch(..., { next })`.
+ */
+export type HttpServerCacheOptions = {
+  mode?: RequestCache;
+  revalidate?: number | false;
+  tags?: string[];
+};
+
 /** Config accepted by every HTTP method on `HttpServer`. */
 export type HttpServerRequestConfig = {
   /** Query string params to append to the URL. */
@@ -69,6 +80,11 @@ export type HttpServerRequestConfig = {
    * @see https://nextjs.org/docs/app/api-reference/functions/fetch
    */
   next?: NextFetchRequestConfig;
+  /**
+   * Optional cache helper to avoid repeating raw `cache` + `next` wiring.
+   * Useful for request-level cache policies (revalidate/tags).
+   */
+  cacheOptions?: HttpServerCacheOptions;
   /** Abort signal for request cancellation. */
   signal?: AbortSignal;
   /**

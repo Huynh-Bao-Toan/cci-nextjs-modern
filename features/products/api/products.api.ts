@@ -12,6 +12,8 @@ import { toProductsApiError } from "./products.client";
 import { buildProductsSearchRequest, productsRoutes } from "./products.routes";
 import { apiBaseUrls, ApiService } from "@/lib/constants/apis";
 
+const categoriesCacheTag = "products:categories";
+
 const http = createHttpServer({
   baseURL: apiBaseUrls[ApiService.DummyJson],
 });
@@ -43,7 +45,11 @@ export async function getProductById(id: ProductId): Promise<RawProduct> {
 export async function getCategories(): Promise<RawCategoriesResponse> {
   try {
     return await http.get<RawCategoriesResponse>(productsRoutes.categories, {
-      cache: "force-cache",
+      cacheOptions: {
+        mode: "force-cache",
+        revalidate: 3600,
+        tags: [categoriesCacheTag],
+      },
     });
   } catch (error) {
     throw toProductsApiError(error);
