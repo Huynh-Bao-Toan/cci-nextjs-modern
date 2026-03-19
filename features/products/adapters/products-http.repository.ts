@@ -2,7 +2,7 @@ import {
   getCategories as getCategoriesEndpoint,
   getProductById as getProductByIdEndpoint,
   searchProducts as searchProductsEndpoint,
-} from "../api/products.endpoints";
+} from "../api/products.api";
 import { mapRawProduct, mapRawProductsResponse } from "../api/products.mappers";
 import { rawCategoriesResponseSchema } from "../api/products.schemas";
 import { ProductsApiError } from "../api/products.client";
